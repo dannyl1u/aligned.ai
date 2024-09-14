@@ -3,6 +3,8 @@ import os
 import asyncio
 from groq import AsyncGroq
 
+#TODO chromadb
+
 load_dotenv()
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -23,7 +25,7 @@ async def chat():
         if i == 0:
             user_message = MODEL_PROMPT
         else:
-            user_message = input("You: ")  # Capture user input from the console
+            user_message = input("You: ")
         messages.append({'role': 'user', 'content': user_message})
 
         print("Model response:")
