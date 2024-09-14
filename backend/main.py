@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Body
+from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
 import os
 from groq import AsyncGroq
@@ -38,14 +38,14 @@ As I answer, use my previous answers to ask more meaningful and deep questions, 
 Ask questions that make me reveal what my values are.
 """
 
-async def chat(user_id: str, user_message: str):
+async def chat(email: str, user_message: str):
     client = AsyncGroq(api_key=GROQ_API_KEY)
     
     # Retrieve previous messages for context
     results = collection.query(
         query_texts=[user_message],
         n_results=10,
-        where={"user_id": user_id}
+        where={"email": email}
     )
     previous_messages = results['documents'][0]
     
@@ -67,18 +67,22 @@ async def chat(user_id: str, user_message: str):
 app = FastAPI()
 
 class ChatRequest(BaseModel):
-    user_id: str
+    email: EmailStr
     message: str
+
+class GetSimilarRequest(BaseModel):
+    email: EmailStr
 
 @app.get("/")
 async def read_root():
     return {"message": "Hello, FastAPI!!!!"}
 
-@app.get("/getMostSimilar/{user_id}")
-async def get_most_similar(user_id: str):
+@app.get("/getMostSimilar")
+async def get_most_similar(request: GetSimilarRequest = Body(...)):
+    email = request.email
     # Get all messages for the given user
     user_messages = collection.get(
-        where={"user_id": user_id}
+        where={"email": email}
     )
     
     if not user_messages['documents']:
@@ -91,16 +95,16 @@ async def get_most_similar(user_id: str):
     results = collection.query(
         query_texts=[combined_query],
         n_results=50,
-        where={"user_id": {"$ne": user_id}},  # Exclude the current user
+        where={"email": {"$ne": email}},  # Exclude the current user
         include=['metadatas', 'distances']
     )
     
     # Process results to get the most similar user
     similar_users = {}
     for metadata, distance in zip(results['metadatas'][0], results['distances'][0]):
-        similar_user_id = metadata['user_id']
-        if similar_user_id not in similar_users or distance < similar_users[similar_user_id]:
-            similar_users[similar_user_id] = distance
+        similar_user_email = metadata['email']
+        if similar_user_email not in similar_users or distance < similar_users[similar_user_email]:
+            similar_users[similar_user_email] = distance
     
     # Sort similar users by similarity score (lower distance is more similar)
     sorted_similar_users = sorted(similar_users.items(), key=lambda x: x[1])
@@ -113,27 +117,28 @@ async def get_most_similar(user_id: str):
 
 @app.post("/chat")
 async def process_chat(chat_request: ChatRequest):
-    user_id = chat_request.user_id
+    email = chat_request.email
     user_message = chat_request.message
     
     # Call the chat function and get the LLM response
-    llm_response = await chat(user_id, user_message)
+    llm_response = await chat(email, user_message)
     
     # Add the user message to the collection
     collection.add(
         documents=[user_message],
-        ids=[f"user_message_{user_id}_{collection.count()}"],
-        metadatas=[{"user_id": user_id}]
+        ids=[f"user_message_{email}_{collection.count()}"],
+        metadatas=[{"email": email}]
     )
     
-    return {"user_id": user_id, "user_message": user_message, "llm_response": llm_response}
+    return {"email": email, "user_message": user_message, "llm_response": llm_response}
 
-@app.get("/user_messages/{user_id}")
-async def get_user_messages(user_id: str):
+@app.post("/user_messages")
+async def get_user_messages(request: GetSimilarRequest = Body(...)):
+    email = request.email
     user_messages = collection.get(
-        where={"user_id": user_id}
+        where={"email": email}
     )
-    return {"user_id": user_id, "messages": user_messages['documents']}
+    return {"email": email, "messages": user_messages['documents']}
 
 if __name__ == "__main__":
     import uvicorn
