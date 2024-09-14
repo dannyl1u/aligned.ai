@@ -1,11 +1,26 @@
+'use client'
+
 import { LogOut, Mic, Search, Settings, Users } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
+import { useEffect } from 'react'
+import { useUser } from '@auth0/nextjs-auth0/client'
 
 export default function HomePage() {
+  const { user, error, isLoading } = useUser()
+
+  useEffect(() => {
+    if (user) {
+      console.log(user)
+    }
+  }, [user])
+
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>{error.message}</div>
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
