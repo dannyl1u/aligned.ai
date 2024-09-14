@@ -1,0 +1,21 @@
+# .gitignore
+
+# Virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment variables and configuration
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# Logs and database
+*.log
+*.sqlite3
