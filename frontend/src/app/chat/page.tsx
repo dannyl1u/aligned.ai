@@ -73,20 +73,22 @@ export default function ChatPage() {
     }
   }
 
-  const transcribeAudio = async (file: File) => {
-    // if (!audioFile) {
-    //   console.error('No audio file selected')
-    //   return
-    // }
+  const speak = (text) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text)
+      window.speechSynthesis.speak(utterance)
+    } else {
+      console.warn('Speech Synthesis not supported in this browser.')
+    }
+  }
 
+  const transcribeAudio = async (file: File) => {
     setIsTranscribing(true)
 
     try {
-      console.log('Transcribing audio...', process.env.NEXT_APP_GROQ_API_KEY)
+      console.log('Transcribing audio...', process.env.NEXT_PUBLIC_GROQ_API_KEY)
       const client = new Groq({
-        apiKey:
-          process.env.GROQ_API_KEY ||
-          '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',
+        apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY || '',
         dangerouslyAllowBrowser: true,
       })
 
@@ -101,13 +103,14 @@ export default function ChatPage() {
       const transcription = transcriptionResponse.text || ''
       setMessages((prev) => [...prev, { role: 'user', content: transcription }])
 
-      // Here you would typically send the transcription to your backend for processing
-      // and receive a response. For now, we'll just echo the transcription.
+      // Process bot's response
       setTimeout(() => {
+        const botResponse = `I heard you say: "${transcription}"`
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: `I heard you say: "${transcription}"` },
+          { role: 'assistant', content: botResponse },
         ])
+        speak(botResponse) // Convert text to speech
         setIsTranscribing(false)
       }, 1000)
     } catch (error) {
@@ -126,7 +129,7 @@ export default function ChatPage() {
   const handleVoiceInput = () => {
     if (isRecording) {
       stopRecording()
-      transcribeAudio()
+      // transcribeAudio()
     } else {
       startRecording()
     }
