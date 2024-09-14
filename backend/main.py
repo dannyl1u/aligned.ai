@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import re
 from dotenv import load_dotenv
 import os
 from groq import AsyncGroq
@@ -45,7 +44,8 @@ async def chat(user_id: str, user_message: str):
     # Retrieve previous messages for context
     results = collection.query(
         query_texts=[user_message],
-        n_results=10
+        n_results=10,
+        where={"user_id": user_id}
     )
     previous_messages = results['documents'][0]
     
@@ -76,39 +76,40 @@ async def read_root():
 
 @app.get("/getMostSimilar/{user_id}")
 async def get_most_similar(user_id: str):
-    # Get all messages
-    all_messages = collection.get()
+    # Get all messages for the given user
+    user_messages = collection.get(
+        where={"user_id": user_id}
+    )
     
-    # Filter messages for the given user
-    user_messages = [doc for doc, id in zip(all_messages['documents'], all_messages['ids']) 
-                     if f"user_message_{user_id}_" in id]
-    
-    if not user_messages:
+    if not user_messages['documents']:
         return {"message": "No messages found for this user"}
     
     # Combine all user messages into a single query
-    combined_query = " ".join(user_messages)
+    combined_query = " ".join(user_messages['documents'])
     
     # Query the collection for similar messages
     results = collection.query(
         query_texts=[combined_query],
-        n_results=50,  # Increase this number to ensure we get enough results after filtering
+        n_results=50,
+        where={"user_id": {"$ne": user_id}},  # Exclude the current user
+        include=['metadatas', 'distances']
     )
     
-    # Extract user IDs from the results, excluding the current user
-    similar_user_ids = {}
-    for id, distance in zip(results['ids'][0], results['distances'][0]):
-        match = re.search(r'user_message_(\w+)_', id)
-        if match:
-            similar_user_id = match.group(1)
-            if similar_user_id != user_id:
-                if similar_user_id not in similar_user_ids or distance < similar_user_ids[similar_user_id]:
-                    similar_user_ids[similar_user_id] = distance
+    # Process results to get the most similar user
+    similar_users = {}
+    for metadata, distance in zip(results['metadatas'][0], results['distances'][0]):
+        similar_user_id = metadata['user_id']
+        if similar_user_id not in similar_users or distance < similar_users[similar_user_id]:
+            similar_users[similar_user_id] = distance
     
     # Sort similar users by similarity score (lower distance is more similar)
-    sorted_similar_users = sorted(similar_user_ids.keys(), key=lambda x: similar_user_ids[x])
+    sorted_similar_users = sorted(similar_users.items(), key=lambda x: x[1])
     
-    return {"most_similar_users": sorted_similar_users[:1]}  # Returns most similar users
+    if sorted_similar_users:
+        most_similar_user = sorted_similar_users[0][0]
+        return {"most_similar_user": most_similar_user}
+    else:
+        return {"message": "No similar users found"}
 
 @app.post("/chat")
 async def process_chat(chat_request: ChatRequest):
@@ -121,17 +122,18 @@ async def process_chat(chat_request: ChatRequest):
     # Add the user message to the collection
     collection.add(
         documents=[user_message],
-        ids=[f"user_message_{user_id}_{collection.count()}"]
+        ids=[f"user_message_{user_id}_{collection.count()}"],
+        metadatas=[{"user_id": user_id}]
     )
     
     return {"user_id": user_id, "user_message": user_message, "llm_response": llm_response}
 
 @app.get("/user_messages/{user_id}")
 async def get_user_messages(user_id: str):
-    all_messages = collection.get()
-    user_messages = [doc for doc, id in zip(all_messages['documents'], all_messages['ids']) 
-                     if f"user_message_{user_id}_" in id]
-    return {"user_id": user_id, "messages": user_messages}
+    user_messages = collection.get(
+        where={"user_id": user_id}
+    )
+    return {"user_id": user_id, "messages": user_messages['documents']}
 
 if __name__ == "__main__":
     import uvicorn
