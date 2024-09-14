@@ -73,7 +73,7 @@ export default function ChatPage() {
     }
   }
 
-  const speak = (text) => {
+  const speak = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text)
       window.speechSynthesis.speak(utterance)
