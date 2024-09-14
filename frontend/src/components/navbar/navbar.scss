@@ -1,0 +1,49 @@
+.navbar-wrapper {
+    padding-left: 1rem;
+    padding-right: 3rem;
+    padding-top: 1rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #E6E6E6 ;
+    .name {
+      font-weight: 600;
+    }
+    .links-wrapper {
+      button {
+        text-decoration: none;
+        padding: 30px;
+
+        opacity: 0.6;
+        transition: all 0.2s ease-in-out;
+        font-size: 16px;
+        background-color: transparent;
+        outline: none;
+        border: 0px;
+        cursor: pointer;
+        &:hover {
+          opacity: 1;
+          text-decoration: underline;
+        }
+      }
+      .active {
+        color: black;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .signout {
+    background-color: #1A3152 !important;
+    border-radius: 2rem;
+
+    color: white;
+    opacity: 1 !important;
+
+
+}
+
+.active {
+  text-decoration: dotted;
+ }
