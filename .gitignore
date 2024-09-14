@@ -19,3 +19,6 @@ __pycache__/
 # Logs and database
 *.log
 *.sqlite3
+
+# Chroma storage
+chroma
