@@ -117,6 +117,7 @@ function ChatPageContent() {
       if (userMessageCount === 5) {
         setMessages(updatedMessages)
         setShowConfirmation(true)
+        cancelSpeech() // Stop any ongoing speech synthesis
         return // Exit early to show confirmation screen
       }
 
@@ -164,8 +165,6 @@ function ChatPageContent() {
 
   const saveChatHistoryAndRedirect = async () => {
     try {
-      cancelSpeech() // Stop any ongoing speech synthesis
-
       const chatHistoryPayload = {
         email: user?.email || '',
         messages: messages
