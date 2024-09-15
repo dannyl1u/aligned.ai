@@ -6,20 +6,22 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Groq } from 'groq-sdk'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useRouter } from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0/client'
 
 export default function ChatPage() {
   const { user, error, isLoading } = useUser()
+  const router = useRouter()
 
   const [isRecording, setIsRecording] = useState(false)
-  // const [audioFile, setAudioFile] = useState<File | null>(null)
   const [messages, setMessages] = useState<
     { role: 'user' | 'assistant'; content: string }[]
-  >([])
+  >([{ role: 'assistant', content: 'Hey! Tell me about yourself.' }]) // Initial bot message
   const [isTranscribing, setIsTranscribing] = useState(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [redirecting, setRedirecting] = useState(false) // New state for redirecting
 
   useEffect(() => {
     if (user) {
@@ -31,7 +33,15 @@ export default function ChatPage() {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
     }
-  }, [messages])
+
+    // Check if the chat should terminate after 5 user messages (excluding bot messages)
+    const userMessageCount = messages.filter(
+      (msg) => msg.role === 'user'
+    ).length
+    if (userMessageCount >= 5 && !redirecting) {
+      saveChatHistoryAndTerminate()
+    }
+  }, [messages, redirecting])
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
@@ -54,9 +64,6 @@ export default function ChatPage() {
           type: 'audio/wav',
         })
         transcribeAudio(file)
-        // setAudioFile(
-        //   new File([audioBlob], 'recorded_audio.wav', { type: 'audio/wav' })
-        // )
       }
 
       mediaRecorderRef.current.start()
@@ -151,10 +158,37 @@ export default function ChatPage() {
     }
   }
 
+  const saveChatHistoryAndTerminate = async () => {
+    try {
+      setRedirecting(true) // Set redirecting to true to show "Hang on tight!" message
+      const chatHistoryPayload = {
+        email: user?.email || '',
+        messages: messages
+          .filter((msg) => msg.role === 'user')
+          .map((msg) => msg.content),
+      }
+
+      await fetch('http://localhost:8000/save_chat_history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(chatHistoryPayload),
+      })
+
+      // Show "Hang on tight!" message for 3 seconds before redirecting
+      setMessages([{ role: 'assistant', content: 'Hang on tight!' }])
+      setTimeout(() => {
+        router.push('/home')
+      }, 1000)
+    } catch (error) {
+      console.error('Error saving chat history:', error)
+    }
+  }
+
   const handleVoiceInput = () => {
     if (isRecording) {
       stopRecording()
-      // transcribeAudio()
     } else {
       startRecording()
     }

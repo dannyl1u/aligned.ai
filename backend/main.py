@@ -43,18 +43,16 @@ Ask increasingly challenging questions that make me reveal what my values are. D
 async def chat(email: str, user_message: str):
     client = AsyncGroq(api_key=GROQ_API_KEY)
     
-    # Retrieve previous messages for context
-    results = collection.query(
-        query_texts=[user_message],
-        n_results=10,
-        where={"email": email}
-    )
-    previous_messages = results['documents'][0] if results['documents'] else []
+    # # Retrieve previous messages for context
+    # results = collection.query(
+    #     query_texts=[user_message],
+    #     n_results=10,
+    #     where={"email": email}
+    # )
+    # previous_messages = results['documents'][0] if results['documents'] else []
     
     # Construct the messages list
     messages = [{'role': 'system', 'content': MODEL_PROMPT}]
-    for prev_message in previous_messages:
-        messages.append({'role': 'user', 'content': prev_message})
     messages.append({'role': 'user', 'content': user_message})
     
     # Get the LLM response
@@ -136,7 +134,7 @@ async def process_chat(chat_request: ChatRequest):
     # Call the chat function and get the LLM response
     llm_response = await chat(email, full_message)
     
-    # Add the user messages to the collection
+    # Commenting out the storage logic as requested
     # collection.add(
     #     documents=user_messages,
     #     ids=[f"user_message_{email}_{collection.count() + i}" for i in range(len(user_messages))],
@@ -152,6 +150,22 @@ async def get_user_messages(request: GetSimilarRequest = Body(...)):
         where={"email": email}
     )
     return {"email": email, "messages": user_messages['documents']}
+
+@app.post("/save_chat_history")
+async def save_chat_history(chat_request: ChatRequest):
+    email = chat_request.email
+    user_messages = chat_request.messages
+    full_message = "\n".join(user_messages)
+
+    # TODO: actually save the shit
+    # # Save the chat history to the database
+    # collection.add(
+    #     document=user_messages,
+    #     id=[f"user_messages_{email}"],
+    #     metadata=[{"email": email}]
+    # )
+
+    return {"status": "success", "message": "Chat history saved successfully"}
 
 if __name__ == "__main__":
     import uvicorn
