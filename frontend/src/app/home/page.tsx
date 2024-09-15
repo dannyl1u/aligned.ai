@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import Header from '@/components/ui/header'
 
 export default function HomePage() {
   const { user, error, isLoading } = useUser()
@@ -23,45 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/home" className="flex items-center space-x-2">
-                <Mic className="h-6 w-6 text-primary" />
-                <span className="text-2xl font-bold text-primary">
-                  VoiceVenture
-                </span>
-              </Link>
-              <Tabs defaultValue="search" className="w-[400px]">
-                <TabsList>
-                  <TabsTrigger value="search">
-                    <Search className="h-4 w-4 mr-2" />
-                    Search
-                  </TabsTrigger>
-                  <TabsTrigger value="network">
-                    <Users className="h-4 w-4 mr-2" />
-                    Network
-                  </TabsTrigger>
-                  <TabsTrigger value="settings">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <Link href="/api/auth/logout">
-              <Button
-                variant="ghost"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header/>
       <main className="flex-1 container mx-auto px-4 py-8">
         <Tabs defaultValue="search">
           <TabsContent value="search" className="mt-6">

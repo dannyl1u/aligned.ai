@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Groq } from 'groq-sdk'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRouter } from 'next/navigation'
+import Header from '@/components/ui/header'
 
 function ChatPageContent() {
   const { user, error, isLoading } = useUser()
@@ -148,7 +149,7 @@ function ChatPageContent() {
         { role: 'assistant', content: botResponse },
       ])
 
-      speak(botResponse)
+      // speak(botResponse)
     } catch (error) {
       console.error('Error transcribing audio:', error)
       setMessages((prev) => [
@@ -197,10 +198,10 @@ function ChatPageContent() {
   }
 
   return (
+    <div className="flex flex-col min-h-screen">
+      <Header pageName="Chat"/>
+
     <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 to-blue-100">
-      <header className="bg-white shadow-sm py-4 px-6">
-        <h1 className="text-2xl font-bold text-primary">VoiceVenture Chat</h1>
-      </header>
       <main className="flex-1 overflow-hidden p-6">
         {showConfirmation ? (
           <div className="flex flex-col items-center justify-center h-full">
@@ -268,6 +269,7 @@ function ChatPageContent() {
           </div>
         </footer>
       )}
+    </div>
     </div>
   )
 }
