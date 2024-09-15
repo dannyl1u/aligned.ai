@@ -9,18 +9,24 @@ import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const { user, error, isLoading } = useUser()
   const [userType, setUserType] = useState('VC')
   const [matchType, setMatchType] = useState('VC')
-
+  const router = useRouter()
 
   useEffect(() => {
     if (user) {
       console.log(user)
     }
   }, [user])
+
+  const goToChat = () => {
+    console.log(user)
+    router.push('/chat')
+  }
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
@@ -98,6 +104,7 @@ export default function HomePage() {
             <div className='mt-10'>
             <Button 
                 type="submit" 
+                onClick={() => goToChat()}
               >
                 <span>Let's get started! →</span>
               </Button>
