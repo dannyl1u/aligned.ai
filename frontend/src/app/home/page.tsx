@@ -7,11 +7,14 @@ import { Button } from '@/components/ui/button'
 import Header from '@/components/ui/header'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
 
 export default function HomePage() {
   const { user, error, isLoading } = useUser()
+  const [userType, setUserType] = useState('VC')
+  const [matchType, setMatchType] = useState('VC')
+
 
   useEffect(() => {
     if (user) {
@@ -28,7 +31,7 @@ export default function HomePage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <Tabs defaultValue="search">
           <TabsContent value="search" className="mt-6">
-            <h2 className="text-2xl font-bold mb-4">Find Founders and VCs</h2>
+            <h2 className="text-2xl font-bold mb-4">Tells us about yourself</h2>
             <div className="max-w-xl">
               <form className="flex space-x-2">
                 <Input
@@ -40,15 +43,73 @@ export default function HomePage() {
                   Speak
                 </Button>
               </form>
+              
             </div>
             <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">I am a</h2>
+            <button
+                      type="button"
+                      className={`flex-1 px-4 py-2 focus:outline-none ${
+                        userType === 'VC'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-background text-foreground'
+                      } hover:bg-opacity-100 active:bg-opacity-100`}
+                      onClick={() => setUserType('VC')}
+                    >
+                      VC
+                    </button>
+                    <button
+                      type="button"
+                      className={`flex-1 px-4 py-2 focus:outline-none ${
+                        userType === 'Founder'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-background text-foreground'
+                      } hover:bg-opacity-100 active:bg-opacity-100`}
+                      onClick={() => setUserType('Founder')}
+                    >
+                      Founder
+                    </button>
+            </div>
+            <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">I'm looking to match with a</h2>
+            <button
+                      type="button"
+                      className={`flex-1 px-4 py-2 focus:outline-none ${
+                        matchType === 'VC'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-background text-foreground'
+                      } hover:bg-opacity-100 active:bg-opacity-100`}
+                      onClick={() => setMatchType('VC')}
+                    >
+                      VC
+                    </button>
+                    <button
+                      type="button"
+                      className={`flex-1 px-4 py-2 focus:outline-none ${
+                        matchType === 'Founder'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-background text-foreground'
+                      } hover:bg-opacity-100 active:bg-opacity-100`}
+                      onClick={() => setMatchType('Founder')}
+                    >
+                      Founder
+                    </button>
+            </div>
+            <div className='mt-10'>
+            <Button 
+                type="submit" 
+              >
+                <span>Let's get started! →</span>
+              </Button>
+            </div>
+            {/* <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Recent Searches</h3>
               <ul className="space-y-2">
                 <li>Tech founders in San Francisco</li>
                 <li>VCs specializing in AI startups</li>
                 <li>Seed-stage investors for fintech</li>
               </ul>
-            </div>
+            </div> */}
           </TabsContent>
           <TabsContent value="network" className="mt-6">
             <h2 className="text-2xl font-bold mb-4">Your Network</h2>
