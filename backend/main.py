@@ -194,19 +194,17 @@ async def get_all_chats(request: GetAllChatsRequest = Body(...)):
     results = collection.get(
         where={"email": email}
     )
+    metadatas = results["metadatas"]
     
-    chat_history = []
-    for doc, metadata in zip(results['documents'], results['metadatas']):
-        user_messages = json.loads(metadata.get('user_messages', '[]'))
-        llm_response = metadata.get('llm_response', '')
-        chat_history.append({
-            "user_messages": user_messages,
-            "llm_response": llm_response,
-            "full_text": doc
-        })
+    all_user_messages = []
+    for metadata in metadatas:
+        if 'user_messages' in metadata:
+            user_messages = json.loads(metadata['user_messages'])
+            all_user_messages.extend(user_messages)
     
-    return {"email": email, "chat_history": chat_history}
-
+    joined_messages = ". ".join(all_user_messages)
+    
+    return {"email": email, "all_messages": joined_messages}
 
 if __name__ == "__main__":
     import uvicorn
