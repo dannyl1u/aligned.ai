@@ -1,24 +1,16 @@
 {
-    "users": [
-        {
-            "user_email": "mding8166@gmail.com",
-            "given_name": "Michael",
-            "family_name": "Ding",
-            "name": "Michael Ding",
-            "picture": "https://lh3.googleusercontent.com/a/ACg8ocLIFWxzfv3fsSKcj5NdadbJF_DEj8AstjSnMBbzo55NnPeAVx4F=s96-c",
-            "linkedin": "https://www.linkedin.com/in/michael-ding-37a83aa6/",
-            "website": "https://github.com/michael1ding",
-            "webSummitProfile": "https://websummit.com/blog/how-to/mobile-app-tech-event-guide-tickets/"
-        },
-        {
-            "user_email": "m.michael1ding@gmail.com",
-            "given_name": "Michael",
-            "family_name": "",
-            "name": "Michael",
-            "picture": "https://lh3.googleusercontent.com/a/ACg8ocKGKsjd8OyznIG6YGgUh2veN7Uo_5lrBTUoaefoCwE-iqNzuA=s96-c",
-            "linkedin": "https://www.linkedin.com/in/michael-ding-37a83aa6/",
-            "website": "https://github.com/michael1ding",
-            "webSummitProfile": "https://websummit.com/blog/how-to/mobile-app-tech-event-guide-tickets/"
-        }
-    ]
+  "users": [
+    {
+      "user_email": "m.michael1ding@gmail.com",
+      "given_name": "Michael",
+      "family_name": "",
+      "name": "Michael",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKGKsjd8OyznIG6YGgUh2veN7Uo_5lrBTUoaefoCwE-iqNzuA=s96-c",
+      "linkedin": "https://www.linkedin.com/in/michael-ding-37a83aa6/",
+      "website": "https://github.com/michael1ding",
+      "webSummitProfile": "https://websummit.com/blog/how-to/mobile-app-tech-event-guide-tickets/",
+      "userType": "VC",
+      "matchType": "Founder"
+    }
+  ]
 }

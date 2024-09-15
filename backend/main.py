@@ -87,6 +87,8 @@ class SetNewUserRequest(BaseModel):
     linkedin: str
     website: str
     webSummitProfile: str
+    userType: str
+    matchType: str
     
 
 class GetSimilarRequest(BaseModel):
@@ -134,6 +136,8 @@ async def set_new_user(request: SetNewUserRequest):
 
         # Add the new user to the list
         data["users"].append(new_user)
+
+        print('adding new user', new_user)
 
         # Write the updated data back to the JSON file
         with open("users.json", 'w') as f:

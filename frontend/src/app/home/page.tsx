@@ -26,6 +26,8 @@ interface UserData {
   linkedin: string
   website: string
   webSummitProfile: string
+  userType: string
+  matchType: string
 }
 
 export default function HomePage() {
@@ -54,15 +56,17 @@ export default function HomePage() {
         const data = await response.json()
 
         if (data.status === 'success') {
-          setUserData(data.user)
+          console.log('User exists:', data.user)
           setUserData({
             profileImage: data.user?.picture || '',
-            keywords: ['Startup', 'Tech', userType],
-            description: `I am a ${userType} looking to connect with ${matchType}s`,
+            keywords: ['Startup', 'Tech', data.user?.userType || ''],
+            description: `I am a ${data.user?.userType} looking to connect with ${data.user?.matchType}s`,
             email: email || data.user?.email || '',
             linkedin: data.user?.linkedin,
             website: data.user?.website,
             webSummitProfile: data.user?.webSummitProfile,
+            userType: data.user?.userType,
+            matchType: data.user?.matchType,
           })
         } else {
           console.log('User does not exist, showing modal')
@@ -95,6 +99,7 @@ export default function HomePage() {
     }
 
     try {
+      console.log('submitting profile:', payload)
       const response = await fetch('http://localhost:8000/submit_profile', {
         method: 'POST',
         headers: {

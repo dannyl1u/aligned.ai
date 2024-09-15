@@ -181,6 +181,8 @@ function ChatPageContent() {
           .map((msg) => msg.content),
       }
 
+      console.log('saving chat history:', chatHistoryPayload)
+
       await fetch('http://localhost:8000/save_chat_history', {
         method: 'POST',
         headers: {
