@@ -16,14 +16,39 @@ function ChatPageContent() {
 
   const [isRecording, setIsRecording] = useState(false)
   const [messages, setMessages] = useState<
-    { role: string; content: string }[]
-  >([{ role: 'assistant', content: 'Hey! Tell me about yourself.' }])
+    { role: 'user' | 'assistant'; content: string }[]
+  >([
+    {
+      role: 'assistant',
+      content:
+        'Hey! Tell me a bit about yourself, what you do, and what you are looking for 🙂.',
+    },
+  ])
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const utteranceRef = useRef<SpeechSynthesisUtterance[]>([])
+
+  // Ensure the check is done every time the component is mounted and when the window gains focus
+  useEffect(() => {
+    if (user && user.email) {
+      checkUserInChroma(user.email)
+    }
+
+    const handleFocus = () => {
+      if (user && user.email) {
+        checkUserInChroma(user.email)
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [user]) // Dependency on user to ensure the check is enforced
 
   useEffect(() => {
     document.title = 'VoiceVenture | Chat';
@@ -37,6 +62,22 @@ function ChatPageContent() {
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
+
+  const checkUserInChroma = async (email: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/check_user_in_chroma/${email}`
+      )
+      const data = await response.json()
+
+      if (data.status === 'success') {
+        console.log('hi1')
+        setShowConfirmation(true)
+      }
+    } catch (error) {
+      console.error('Error checking user in ChromaDB:', error)
+    }
+  }
 
   const startRecording = async () => {
     try {
@@ -114,7 +155,7 @@ function ChatPageContent() {
       const transcription = transcriptionResponse.text || ''
       const updatedMessages = [
         ...messages,
-        { role: 'user', content: transcription },
+        { role: 'user' as 'user' | 'assistant', content: transcription },
       ]
 
       const userMessageCount = updatedMessages.filter(
@@ -179,6 +220,8 @@ function ChatPageContent() {
           .map((msg) => msg.content),
       }
 
+      console.log('saving chat history:', chatHistoryPayload)
+
       await fetch('http://localhost:8000/save_chat_history', {
         method: 'POST',
         headers: {
@@ -208,8 +251,8 @@ function ChatPageContent() {
       <Header />
       <main className="flex-1 overflow-hidden p-6">
         {showConfirmation ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Rocket className="w-24 h-24 text-primary animate-bounce mb-4" />
+          <div className="text-center">
+            <Rocket className="w-24 h-24 text-primary animate-bounce mb-4 mx-auto" />
             <h2 className="text-3xl font-bold mb-4">
               We&apos;ve finished analyzing your personality profile!
             </h2>
@@ -221,7 +264,7 @@ function ChatPageContent() {
             </Button>
           </div>
         ) : (
-          <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
+          <ScrollArea className="h-full w-full pr-4" ref={scrollAreaRef}>
             {messages.map((message, index) => (
               <div
                 key={index}

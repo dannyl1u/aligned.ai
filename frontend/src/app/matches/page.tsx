@@ -70,7 +70,7 @@ const MatchesPageContent: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 to-blue-100">
+      <div className="flex flex-col bg-gradient-to-br from-purple-100 to-blue-100">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
           {matches.length === 0 ? (
             <p className="text-center text-gray-500">No matches found.</p>
@@ -79,6 +79,7 @@ const MatchesPageContent: React.FC = () => {
               <Card
                 key={index}
                 name={match.name}
+                score={match.score}
                 profileImage={match.profileImage} // Assuming the API returns this
                 keywords={match.keywords} // Assuming keywords is an array
                 description={match.description} // Assuming description of the match
