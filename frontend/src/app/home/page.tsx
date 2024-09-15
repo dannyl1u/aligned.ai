@@ -177,6 +177,7 @@ export default function HomePage() {
           userType,
           matchType,
         })
+        router.push('/chat')
       } else {
         console.error('Error submitting profile:', response.statusText)
       }
