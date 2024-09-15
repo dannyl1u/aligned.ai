@@ -21,7 +21,6 @@ __pycache__/
 *.sqlite3
 
 # Chroma storage
-chroma
-
+chroma_storage/
 
 ENV_DIR
