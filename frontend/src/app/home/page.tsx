@@ -52,15 +52,43 @@ export default function HomePage() {
     try {
       const response = await fetch(`http://localhost:8000/user_data/${email}`)
       console.log('response:', response)
+
       if (response.ok) {
         const data = await response.json()
 
         if (data.status === 'success') {
           console.log('User exists:', data.user)
+
+          // Fetch the full conversation from ChromaDB
+          const conversationResponse = await fetch(
+            `http://localhost:8000/get_full_user_conversation/${email}`
+          )
+          let fullDescription = ''
+
+          if (conversationResponse.ok) {
+            const conversationData = await conversationResponse.json()
+            if (
+              conversationData.status === 'success' &&
+              conversationData.user_conversations.length > 0
+            ) {
+              fullDescription = conversationData.user_conversations.join(' ') // Join the messages into a single string
+            } else {
+              console.log(
+                'No full conversation found, using default description'
+              )
+              fullDescription = `I am a ${data.user?.userType} looking to connect with ${data.user?.matchType}s`
+            }
+          } else {
+            console.log(
+              'Error fetching full conversation, using default description'
+            )
+            fullDescription = `I am a ${data.user?.userType} looking to connect with ${data.user?.matchType}s`
+          }
+
           setUserData({
             profileImage: data.user?.picture || '',
             keywords: ['Startup', 'Tech', data.user?.userType || ''],
-            description: `I am a ${data.user?.userType} looking to connect with ${data.user?.matchType}s`,
+            description: fullDescription,
             email: email || data.user?.email || '',
             linkedin: data.user?.linkedin,
             website: data.user?.website,

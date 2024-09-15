@@ -42,17 +42,17 @@ Ask increasingly challenging questions that make me reveal what my values are. D
 """
 
 VC_MODEL_PROMPT = """
-You are seeking to understand my personality as a Venture Fund Manager looking to fund founders. 
+You are seeking to understand my personality. I am a Venture Fund Manager looking to fund founders. 
 Ask me deep questions that prompt me to critically evaluate my personality so that I can be matched to others in the future. You can do this with examples or stories, or test moral situations.
 As I answer, use the user message of our previous conversation to ask more meaningful and deep questions, provoking increasingly thoughtful response that tests my character and what I am like including my interests.
 Ask increasingly challenging questions that make me reveal what my values are. Do not summarize my responses in my previous replies. Only ask the questions that prompt deeper conversation.
 """
 
-async def chat(email: str, user_message: str):
+async def chat(email: str, user_message: str, mode = 'founder'):
     client = AsyncGroq(api_key=GROQ_API_KEY)
     
     # Construct the messages list
-    messages = [{'role': 'system', 'content': MODEL_PROMPT}]
+    messages = [{'role': 'system', 'content': MODEL_PROMPT if mode == 'founder' else VC_MODEL_PROMPT}]
     messages.append({'role': 'user', 'content': user_message})
     
     # Get the LLM response
@@ -195,20 +195,18 @@ async def process_chat(chat_request: ChatRequest):
 
     # Join the user messages with \n
     full_message = "\n".join(user_messages)
-    
+
+    # Check the userType for the given email in users.json
+    with open("users.json", "r") as file:
+        data = json.load(file)
+        users = data["users"]
+        user_type = None
+        for user in users:
+            if user["user_email"] == email:
+                user_type = user["userType"]
+                break
     # Call the chat function and get the LLM response
-    llm_response = await chat(email, full_message)
-    
-    # Store both user messages and LLM response in ChromaDB
-    collection.add(
-        documents=[full_message],  # We use the full message as the document
-        ids=[f"chat_{email}_{collection.count()}"],
-        metadatas=[{
-            "email": email,
-            "user_messages": json.dumps(user_messages),  # Store as JSON string
-            "llm_response": llm_response
-        }]
-    )
+    llm_response = await chat(email, full_message, mode = 'founder' if user_type == 'Founder' else 'VC')
     
     return {"email": email, "llm_response": llm_response}
 
@@ -236,7 +234,7 @@ async def save_chat_history(chat_request: ChatRequest):
     email = chat_request.email
     user_messages = chat_request.messages
     full_message = "\n".join(user_messages)
-    print(full_message)
+    print('saving chat for email', email, 'with details', full_message)
 
     # Save the chat history to the database
     collection.add(
@@ -244,7 +242,7 @@ async def save_chat_history(chat_request: ChatRequest):
         ids=[f"chat_history_{email}_{collection.count()}"],
         metadatas=[{
             "email": email,
-            "user_messages": json.dumps(user_messages),  # Store as JSON string
+            "user_messages": full_message,
         }]
     )
 
@@ -270,6 +268,39 @@ async def get_all_chats(request: GetAllChatsRequest = Body(...)):
     joined_messages = ". ".join(all_user_messages)
     
     return {"email": email, "all_messages": joined_messages}
+
+@app.get("/check_user_in_chroma/{email}")
+async def check_user_in_chroma(email: str):
+    results = collection.get(
+        where={"email": email}
+    )
+
+    if results['documents']:
+        return {"status": "success", "message": "User exists in ChromaDB"}
+    else:
+        return {"status": "error", "message": "User does not exist in ChromaDB"}
+
+@app.get("/get_full_user_conversation/{email}")
+async def get_full_user_conversation(email: str):
+    # Query the collection to get the user's conversation
+    results = collection.get(
+        where={"email": email}
+    )
+
+    # Check if any documents were found
+    if results['documents']:
+        # Retrieve the user messages from the metadata
+        user_conversations = []
+        for metadata in results['metadatas']:
+            user_messages = metadata.get("user_messages", "")
+            if user_messages:
+                user_conversations.append(user_messages)
+
+        # Return the full conversation as a list of messages
+        return {"status": "success", "user_conversations": user_conversations}
+    else:
+        return {"status": "error", "message": "User does not exist in ChromaDB"}
+
 
 if __name__ == "__main__":
     import uvicorn
