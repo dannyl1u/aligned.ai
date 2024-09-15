@@ -34,37 +34,37 @@ export default function LandingPage() {
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center py-2">
           <Link
-            className="text-lg font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4 text-white"
             href="#"
           >
             HOME
           </Link>
           <Link
-            className="text-lg font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4 text-white"
             href="#"
           >
             ABOUT US
           </Link>
           <Link
-            className="text-lg font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4 text-white"
             href="#"
           >
             GET MATCHED
           </Link>
           <Link
-            className="text-lg font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4 text-white"
             href="#"
           >
             STARTUPS
           </Link>
           <Link
-            className="text-lg font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4 text-white"
             href="#"
           >
             VC FUNDS
           </Link>
           <Link href="/api/auth/login">
-            <Button variant="outline" className="text-lg px-6 py-3">Login / Sign Up</Button>
+            <Button variant="outline" className="text-lg px-6 py-3 text-white">Login / Sign Up</Button>
           </Link>
         </nav>
       </header>
