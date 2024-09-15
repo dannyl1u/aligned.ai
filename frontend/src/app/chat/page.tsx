@@ -6,9 +6,9 @@ import { UserProvider, useUser } from '@auth0/nextjs-auth0/client'
 
 import { Button } from '@/components/ui/button'
 import { Groq } from 'groq-sdk'
+import Header from '@/components/ui/header'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/ui/header'
 
 function ChatPageContent() {
   const { user, error, isLoading } = useUser()
@@ -199,77 +199,77 @@ function ChatPageContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header pageName="Chat"/>
+      <Header />
 
-    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 to-blue-100">
-      <main className="flex-1 overflow-hidden p-6">
-        {showConfirmation ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Rocket className="w-24 h-24 text-primary animate-bounce mb-4" />
-            <h2 className="text-3xl font-bold mb-4">
-              We&apos;ve finished analyzing your personality profile!
-            </h2>
-            <p className="text-lg mb-8">
-              We&apos;re excited to share these insights.
-            </p>
-            <Button onClick={saveChatHistoryAndRedirect} size="lg">
-              See my results!
-            </Button>
-          </div>
-        ) : (
-          <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`mb-4 ${
-                  message.role === 'user' ? 'text-right' : 'text-left'
-                }`}
-              >
+      <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 to-blue-100">
+        <main className="flex-1 overflow-hidden p-6">
+          {showConfirmation ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <Rocket className="w-24 h-24 text-primary animate-bounce mb-4" />
+              <h2 className="text-3xl font-bold mb-4">
+                We&apos;ve finished analyzing your personality profile!
+              </h2>
+              <p className="text-lg mb-8">
+                We&apos;re excited to share these insights.
+              </p>
+              <Button onClick={saveChatHistoryAndRedirect} size="lg">
+                See my results!
+              </Button>
+            </div>
+          ) : (
+            <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
+              {messages.map((message, index) => (
                 <div
-                  className={`inline-block p-4 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground'
+                  key={index}
+                  className={`mb-4 ${
+                    message.role === 'user' ? 'text-right' : 'text-left'
                   }`}
                 >
-                  {message.content}
+                  <div
+                    className={`inline-block p-4 rounded-lg ${
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-secondary-foreground'
+                    }`}
+                  >
+                    {message.content}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {isTranscribing && (
-              <div className="text-center">
-                <Loader2 className="w-6 h-6 animate-spin inline-block" />
-                <span className="ml-2">Transcribing...</span>
-              </div>
-            )}
-          </ScrollArea>
-        )}
-      </main>
-      {!showConfirmation && (
-        <footer className="bg-white shadow-sm py-4 px-6">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
-            <Button
-              onClick={handleVoiceInput}
-              className={`w-full ${
-                isRecording ? 'bg-red-500 hover:bg-red-600' : ''
-              }`}
-            >
-              {isRecording ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Recording...
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4 mr-2" />
-                  Start Speaking
-                </>
+              ))}
+              {isTranscribing && (
+                <div className="text-center">
+                  <Loader2 className="w-6 h-6 animate-spin inline-block" />
+                  <span className="ml-2">Transcribing...</span>
+                </div>
               )}
-            </Button>
-          </div>
-        </footer>
-      )}
-    </div>
+            </ScrollArea>
+          )}
+        </main>
+        {!showConfirmation && (
+          <footer className="bg-white shadow-sm py-4 px-6">
+            <div className="flex items-center justify-between max-w-3xl mx-auto">
+              <Button
+                onClick={handleVoiceInput}
+                className={`w-full ${
+                  isRecording ? 'bg-red-500 hover:bg-red-600' : ''
+                }`}
+              >
+                {isRecording ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Recording...
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-4 h-4 mr-2" />
+                    Start Speaking
+                  </>
+                )}
+              </Button>
+            </div>
+          </footer>
+        )}
+      </div>
     </div>
   )
 }

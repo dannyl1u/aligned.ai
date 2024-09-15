@@ -1,18 +1,20 @@
 'use client'
 
-import { Mic, Users, Zap } from 'lucide-react'
+import { Building, Mic, TrendingUp, Users, Zap } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@auth0/nextjs-auth0/client'
-import backgroundImage from './pictures/Background.png';
 
 export default function LandingPage() {
   const { user, error, isLoading } = useUser()
   const router = useRouter()
+  const howItWorksRef = useRef<HTMLDivElement>(null)
+  const startupsRef = useRef<HTMLDivElement>(null)
+  const vcsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (user) {
@@ -20,69 +22,69 @@ export default function LandingPage() {
     }
   }, [user, router])
 
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center relative z-20 bg-black">
+      <header className="px-4 lg:px-6 h-16 flex items-center relative z-20 bg-black">
         <Link className="flex items-center justify-center" href="#">
-          <Mic className="h-8 w-8 text-primary text-white" />
-          <span className="ml-2 text-3xl font-bold text-primary text-white">
+          <Mic className="h-8 w-8 text-white" />
+          <span className="ml-2 text-2xl font-bold text-white tracking-tight bg-clip-text ">
             VoiceVenture
           </span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6 items-center py-2">
-          <Link
-            className="text-lg font-medium hover:underline underline-offset-4 text-white"
-            href="#"
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+          <Button
+            variant="ghost"
+            className="text-sm font-medium text-white hover:text-gray-200 hover:bg-gray-800"
+            onClick={() => scrollToSection(howItWorksRef)}
           >
-            HOME
-          </Link>
-          <Link
-            className="text-lg font-medium hover:underline underline-offset-4 text-white"
-            href="#"
+            How It Works
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium text-white hover:text-gray-200 hover:bg-gray-800"
+            onClick={() => scrollToSection(startupsRef)}
           >
-            ABOUT US
-          </Link>
-          <Link
-            className="text-lg font-medium hover:underline underline-offset-4 text-white"
-            href="#"
+            Startups
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-sm font-medium text-white hover:text-gray-200 hover:bg-gray-800"
+            onClick={() => scrollToSection(vcsRef)}
           >
-            GET MATCHED
-          </Link>
-          <Link
-            className="text-lg font-medium hover:underline underline-offset-4 text-white"
-            href="#"
-          >
-            STARTUPS
-          </Link>
-          <Link
-            className="text-lg font-medium hover:underline underline-offset-4 text-white"
-            href="#"
-          >
-            VC FUNDS
-          </Link>
+            VC Funds
+          </Button>
           <Link href="/api/auth/login">
-            <Button variant="outline" className="text-lg px-6 py-3 text-white">Login / Sign Up</Button>
+            <Button
+              variant="outline"
+              className="text-sm px-4 py-2 text-white hover:bg-white hover:text-black"
+            >
+              Login / Sign Up
+            </Button>
           </Link>
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary mx-auto">
-        <video
-    autoPlay
-    loop
-    muted
-    className="absolute inset-0 w-full h-full object-cover md:h-96 lg:h-[40rem]"
-  >
-    <source src="/waterFull.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary relative">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/waterFull.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
           <div className="container px-4 md:px-6 mx-auto relative z-10">
-            <div className="flex flex-col mx-auto items-center space-y-4 text-center ">
-                <div className="space-y-2 mx-auto ">
-                <h1 className="text-3xl font-bold flex justify-center h-full items-center tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
+            <div className="flex flex-col mx-auto items-center space-y-4 text-center">
+              <div className="space-y-2 mx-auto">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
                   Find Founders and VCs with Your Voice
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-200 md:text-xl">
@@ -92,16 +94,19 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button
-                  size="lg"
-                  className="bg-white text-primary hover:bg-gray-100"
-                >
-                  Get Started
-                </Button>
+                <Link href="/api/auth/login">
+                  <Button
+                    size="lg"
+                    className="bg-white text-primary hover:bg-gray-100"
+                  >
+                    Get Started
+                  </Button>
+                </Link>
                 <Button
                   size="lg"
                   variant="outline"
                   className="text-white border-white hover:bg-white hover:text-primary"
+                  onClick={() => scrollToSection(howItWorksRef)}
                 >
                   Learn More
                 </Button>
@@ -109,21 +114,29 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+        <section
+          ref={howItWorksRef}
+          className="w-full py-12 md:py-24 lg:py-32 bg-gray-100"
+        >
           <div className="container px-4 md:px-6 mx-auto">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8 text-black">
-  How It Works
-</h2>            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8 text-black">
+              How It Works
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center">
                 <Mic className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2 text-black">Speak Your Needs</h3>
+                <h3 className="text-xl font-bold mb-2 text-black">
+                  Speak Your Needs
+                </h3>
                 <p className="text-gray-600">
                   Simply tell us what you're looking for in a founder or VC.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <Zap className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2 text-black">AI-Powered Matching</h3>
+                <h3 className="text-xl font-bold mb-2 text-black">
+                  AI-Powered Matching
+                </h3>
                 <p className="text-gray-600">
                   Our LLM analyzes your request and finds the best matches.
                 </p>
@@ -135,6 +148,47 @@ export default function LandingPage() {
                   Get introduced to relevant founders and VCs in no time.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+        <section
+          ref={startupsRef}
+          className="w-full py-12 md:py-24 lg:py-32 bg-white"
+        >
+          <div className="container px-4 md:px-6 mx-auto">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8 text-black">
+              How Startups Benefit
+            </h2>
+            <div className="flex flex-col items-center text-center">
+              <Building className="h-16 w-16 text-primary mb-4" />
+              <p className="text-gray-600 max-w-2xl">
+                Startups can quickly connect with the right investors, mentors,
+                and partners. Our AI-powered platform understands your unique
+                needs and matches you with VCs who align with your vision and
+                industry focus. Save time and resources in your fundraising
+                journey and focus on what matters most - building your business.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          ref={vcsRef}
+          className="w-full py-12 md:py-24 lg:py-32 bg-gray-100"
+        >
+          <div className="container px-4 md:px-6 mx-auto">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8 text-black">
+              How VCs Benefit
+            </h2>
+            <div className="flex flex-col items-center text-center">
+              <TrendingUp className="h-16 w-16 text-primary mb-4" />
+              <p className="text-gray-600 max-w-2xl">
+                VCs can efficiently discover promising startups that match their
+                investment criteria. Our platform uses advanced AI to analyze
+                startup pitches and match them with your fund's focus areas,
+                stage preferences, and investment thesis. Streamline your deal
+                flow and identify high-potential opportunities faster than ever
+                before.
+              </p>
             </div>
           </div>
         </section>

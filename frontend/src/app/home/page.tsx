@@ -4,11 +4,11 @@ import { LogOut, Mic, Search, Settings, Users } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { Button } from '@/components/ui/button'
+import Header from '@/components/ui/header'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useUser } from '@auth0/nextjs-auth0/client'
-import Header from '@/components/ui/header'
 
 export default function HomePage() {
   const { user, error, isLoading } = useUser()
@@ -24,7 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header/>
+      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <Tabs defaultValue="search">
           <TabsContent value="search" className="mt-6">
