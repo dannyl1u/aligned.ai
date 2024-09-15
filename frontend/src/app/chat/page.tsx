@@ -17,7 +17,13 @@ function ChatPageContent() {
   const [isRecording, setIsRecording] = useState(false)
   const [messages, setMessages] = useState<
     { role: 'user' | 'assistant'; content: string }[]
-  >([{ role: 'assistant', content: 'Hey! Tell me about yourself.' }])
+  >([
+    {
+      role: 'assistant',
+      content:
+        'Hey! Tell me a bit about yourself, what you do, and what you are looking for 🙂.',
+    },
+  ])
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
