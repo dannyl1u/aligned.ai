@@ -74,6 +74,45 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+class SummarizeTextRequest(BaseModel):
+    email: EmailStr
+    text: str
+
+class SummarizeTextResponse(BaseModel):
+    personality_traits: str
+    interests: str
+    work_experience: str
+
+
+
+
+SUMMARIZE_PROMPT = """
+You are a text analysis expert. Summarize the given text by extracting key personality traits, interests, and work experience. Don't use bullet points and do not output any other text.
+"""
+
+async def summarize_with_groq(text: str):
+    client = AsyncGroq(api_key=GROQ_API_KEY)
+    
+    # Construct the messages list
+    messages = [{'role': 'system', 'content': SUMMARIZE_PROMPT}]
+    messages.append({'role': 'user', 'content': text})
+    
+    # Get the LLM response
+    chat_completion = await client.chat.completions.create(
+        messages=messages,
+        model="llama3-8b-8192"
+    )
+    summary = chat_completion.choices[0].message.content
+    
+    # Extract sections from the summary (assuming the format is consistent)
+    personality_traits = summary.split("Personality Traits:")[1].split("Interests:")[0].strip()
+    interests = summary.split("Interests:")[1].split("Work Experience:")[0].strip()
+    work_experience = summary.split("Work Experience:")[1].strip()
+
+
+    return personality_traits, interests, work_experience
+
+
 class ChatRequest(BaseModel):
     email: EmailStr
     messages: List[str]
@@ -100,6 +139,25 @@ class GetCurrentUserExistsRequest(BaseModel):
 @app.get("/")
 async def read_root():
     return {"message": "Hello, FastAPI!!!!"}
+
+
+@app.post("/summarize_text", response_model=SummarizeTextResponse)
+async def summarize_text(request: SummarizeTextRequest):
+    text = request.text
+
+    try:
+        # Use Groq to summarize the text and generate keywords
+        personality_traits, interests, work_experience = await summarize_with_groq(text)
+
+        return SummarizeTextResponse(
+            personality_traits=personality_traits,
+            interests=interests,
+            work_experience=work_experience,
+        )
+
+    except Exception as e:
+        return {"status": "error", "message": f"Failed to summarize text: {str(e)}"}
+
 
 @app.get("/user_data/{email}")
 async def get_current_user_exists(email: str):

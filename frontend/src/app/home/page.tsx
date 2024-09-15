@@ -50,6 +50,7 @@ export default function HomePage() {
 
   const fetchUserData = async (email: string) => {
     try {
+      // Fetch user data from the backend
       const response = await fetch(`http://localhost:8000/user_data/${email}`)
       console.log('response:', response)
 
@@ -64,6 +65,7 @@ export default function HomePage() {
             `http://localhost:8000/get_full_user_conversation/${email}`
           )
           let fullDescription = ''
+          let cohereSummary = null
 
           if (conversationResponse.ok) {
             const conversationData = await conversationResponse.json()
@@ -72,6 +74,26 @@ export default function HomePage() {
               conversationData.user_conversations.length > 0
             ) {
               fullDescription = conversationData.user_conversations.join(' ') // Join the messages into a single string
+
+              // // Hit the Cohere summarization endpoint
+              // const summarizeResponse = await fetch(
+              //   'http://localhost:8000/summarize_text',
+              //   {
+              //     method: 'POST',
+              //     headers: {
+              //       'Content-Type': 'application/json',
+              //     },
+              //     body: JSON.stringify({ email: email, text: fullDescription }),
+              //   }
+              // )
+
+              // if (summarizeResponse.ok) {
+              //   cohereSummary = await summarizeResponse.json()
+              //   fullDescription =
+              //     cohereSummary.personality_traits +
+              //       cohereSummary.interests +
+              //       cohereSummary.work_experience || fullDescription
+              // }
             } else {
               console.log(
                 'No full conversation found, using default description'
@@ -89,7 +111,7 @@ export default function HomePage() {
             profileImage: data.user?.picture || '',
             keywords: ['Startup', 'Tech', data.user?.userType || ''],
             description: fullDescription,
-            email: email || data.user?.email || '',
+            email: email || data.user?.user_email || '',
             linkedin: data.user?.linkedin,
             website: data.user?.website,
             webSummitProfile: data.user?.webSummitProfile,
@@ -148,6 +170,8 @@ export default function HomePage() {
           linkedin,
           website,
           webSummitProfile,
+          userType,
+          matchType,
         })
       } else {
         console.error('Error submitting profile:', response.statusText)
