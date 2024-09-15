@@ -12,13 +12,11 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs' // Adjust imp
 import { Button } from '@/components/ui/button' // Adjust import path based on your project
 import Link from 'next/link'
 import React from 'react'
+import { useRouter } from 'next/navigation' // Import useRouter for navigation
 
-// Define the prop type for the component
-type HeaderProps = {
-  pageName?: string
-}
+const Header: React.FC = () => {
+  const router = useRouter()
 
-const Header: React.FC<HeaderProps> = () => {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4">
@@ -32,17 +30,20 @@ const Header: React.FC<HeaderProps> = () => {
             </Link>
             <Tabs className="w-[400px]">
               <TabsList>
-                <TabsTrigger value="home">
+                <TabsTrigger value="home" onClick={() => router.push('/home')}>
                   <Home className="h-4 w-4 mr-2" />
-                  <Link href="/home">Home</Link>
+                  Home
                 </TabsTrigger>
-                <TabsTrigger value="network">
+                <TabsTrigger
+                  value="network"
+                  onClick={() => router.push('/matches')}
+                >
                   <Users className="h-4 w-4 mr-2" />
-                  <Link href="/matches">Connect</Link>
+                  Connect
                 </TabsTrigger>
-                <TabsTrigger value="chat">
+                <TabsTrigger value="chat" onClick={() => router.push('/chat')}>
                   <Speech className="h-4 w-4 mr-2" />
-                  <Link href="/chat">Chat</Link>
+                  Chat
                 </TabsTrigger>
               </TabsList>
             </Tabs>
