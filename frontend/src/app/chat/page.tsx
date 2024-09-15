@@ -22,6 +22,7 @@ function ChatPageContent() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const utteranceRef = useRef<SpeechSynthesisUtterance[]>([]) // To store all speech utterances
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -71,9 +72,20 @@ function ChatPageContent() {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.rate = rate
+      utteranceRef.current.push(utterance) // Store the utterance for later cancellation
       window.speechSynthesis.speak(utterance)
     } else {
       console.warn('Speech Synthesis not supported in this browser.')
+    }
+  }
+
+  const cancelSpeech = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel() // Cancel all speech
+      utteranceRef.current.forEach((utterance) => {
+        utterance.onend = null // Prevent triggering any end event
+      })
+      utteranceRef.current = [] // Clear the reference array
     }
   }
 
@@ -95,10 +107,8 @@ function ChatPageContent() {
       })
 
       const transcription = transcriptionResponse.text || ''
-      const updatedMessages = [
-        ...messages,
-        { role: 'user', content: transcription },
-      ]
+      const updatedMessages: { role: 'user' | 'assistant'; content: string }[] =
+        [...messages, { role: 'user', content: transcription }]
 
       // Check if this is the 5th user message
       const userMessageCount = updatedMessages.filter(
@@ -107,6 +117,7 @@ function ChatPageContent() {
       if (userMessageCount === 5) {
         setMessages(updatedMessages)
         setShowConfirmation(true)
+        cancelSpeech() // Stop any ongoing speech synthesis
         return // Exit early to show confirmation screen
       }
 
@@ -154,11 +165,6 @@ function ChatPageContent() {
 
   const saveChatHistoryAndRedirect = async () => {
     try {
-      // Stop any ongoing speech synthesis
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-      }
-
       const chatHistoryPayload = {
         email: user?.email || '',
         messages: messages
@@ -174,7 +180,9 @@ function ChatPageContent() {
         body: JSON.stringify(chatHistoryPayload),
       })
 
-      router.push('/home')
+      setTimeout(() => {
+        router.push('/home')
+      }, 100)
     } catch (error) {
       console.error('Error saving chat history:', error)
     }
@@ -197,12 +205,14 @@ function ChatPageContent() {
         {showConfirmation ? (
           <div className="flex flex-col items-center justify-center h-full">
             <Rocket className="w-24 h-24 text-primary animate-bounce mb-4" />
-            <h2 className="text-3xl font-bold mb-4">Hang on tight!</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              We&apos;ve finished analyzing your personality profile!
+            </h2>
             <p className="text-lg mb-8">
-              We've got some exciting insights for you.
+              We&apos;re excited to share these insights.
             </p>
             <Button onClick={saveChatHistoryAndRedirect} size="lg">
-              Let's go!
+              See my results!
             </Button>
           </div>
         ) : (
