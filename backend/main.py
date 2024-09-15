@@ -9,6 +9,7 @@ from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 import cohere
 import logging
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 load_dotenv()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -42,14 +43,6 @@ Ask increasingly challenging questions that make me reveal what my values are. D
 
 async def chat(email: str, user_message: str):
     client = AsyncGroq(api_key=GROQ_API_KEY)
-    
-    # # Retrieve previous messages for context
-    # results = collection.query(
-    #     query_texts=[user_message],
-    #     n_results=10,
-    #     where={"email": email}
-    # )
-    # previous_messages = results['documents'][0] if results['documents'] else []
     
     # Construct the messages list
     messages = [{'role': 'system', 'content': MODEL_PROMPT}]
@@ -134,22 +127,37 @@ async def process_chat(chat_request: ChatRequest):
     # Call the chat function and get the LLM response
     llm_response = await chat(email, full_message)
     
-    # Commenting out the storage logic as requested
-    # collection.add(
-    #     documents=user_messages,
-    #     ids=[f"user_message_{email}_{collection.count() + i}" for i in range(len(user_messages))],
-    #     metadatas=[{"email": email}] * len(user_messages)
-    # )
+    # Store both user messages and LLM response in ChromaDB
+    collection.add(
+        documents=[full_message],  # We use the full message as the document
+        ids=[f"chat_{email}_{collection.count()}"],
+        metadatas=[{
+            "email": email,
+            "user_messages": json.dumps(user_messages),  # Store as JSON string
+            "llm_response": llm_response
+        }]
+    )
     
     return {"email": email, "llm_response": llm_response}
 
 @app.post("/user_messages")
 async def get_user_messages(request: GetSimilarRequest = Body(...)):
     email = request.email
-    user_messages = collection.get(
+    results = collection.get(
         where={"email": email}
     )
-    return {"email": email, "messages": user_messages['documents']}
+    
+    # Extract user messages and LLM responses from metadata
+    chat_history = []
+    for metadata in results['metadatas']:
+        user_messages = json.loads(metadata.get('user_messages', '[]'))
+        llm_response = metadata.get('llm_response', '')
+        chat_history.append({
+            "user_messages": user_messages,
+            "llm_response": llm_response
+        })
+    
+    return {"email": email, "chat_history": chat_history}
 
 @app.post("/save_chat_history")
 async def save_chat_history(chat_request: ChatRequest):
@@ -157,15 +165,40 @@ async def save_chat_history(chat_request: ChatRequest):
     user_messages = chat_request.messages
     full_message = "\n".join(user_messages)
 
-    # TODO: actually save the shit
-    # # Save the chat history to the database
-    # collection.add(
-    #     document=user_messages,
-    #     id=[f"user_messages_{email}"],
-    #     metadata=[{"email": email}]
-    # )
+    # Save the chat history to the database
+    collection.add(
+        documents=[full_message],
+        ids=[f"chat_history_{email}_{collection.count()}"],
+        metadatas=[{
+            "email": email,
+            "user_messages": json.dumps(user_messages),  # Store as JSON string
+        }]
+    )
 
     return {"status": "success", "message": "Chat history saved successfully"}
+
+class GetAllChatsRequest(BaseModel):
+    email: EmailStr
+
+@app.get("/get_all_chats")
+async def get_all_chats(request: GetAllChatsRequest = Body(...)):
+    email = request.email
+    results = collection.get(
+        where={"email": email}
+    )
+    
+    chat_history = []
+    for doc, metadata in zip(results['documents'], results['metadatas']):
+        user_messages = json.loads(metadata.get('user_messages', '[]'))
+        llm_response = metadata.get('llm_response', '')
+        chat_history.append({
+            "user_messages": user_messages,
+            "llm_response": llm_response,
+            "full_text": doc
+        })
+    
+    return {"email": email, "chat_history": chat_history}
+
 
 if __name__ == "__main__":
     import uvicorn
