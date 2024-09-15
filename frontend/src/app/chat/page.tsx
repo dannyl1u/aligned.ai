@@ -103,15 +103,22 @@ export default function ChatPage() {
       })
 
       const transcription = transcriptionResponse.text || ''
-      setMessages((prev) => [...prev, { role: 'user', content: transcription }])
+      const updatedMessages: { role: 'user' | 'assistant'; content: string }[] =
+        [...messages, { role: 'user', content: transcription }]
+      setMessages(updatedMessages)
 
-      // Create the ChatRequest payload
+      // Extract only the user message strings
+      const userMessages = updatedMessages
+        .filter((msg) => msg.role === 'user')
+        .map((msg) => msg.content)
+
+      // Create the ChatRequest payload with just the array of user messages
       const chatRequestPayload = {
-        user_id: user?.email || '', // Use user.email for user_id
-        message: transcription,
+        email: user?.email || '', // Use user.email for user_id
+        messages: userMessages, // Send only the user messages
       }
 
-      // Send the payload to the Flask backend and handle the response
+      // Send the payload to the FastAPI backend and handle the response
       const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: {
@@ -122,7 +129,7 @@ export default function ChatPage() {
 
       const data = await response.json()
 
-      // Process the response from the Flask backend
+      // Process the response from the FastAPI backend
       const botResponse = data.llm_response || 'Sorry, something went wrong.'
       setMessages((prev) => [
         ...prev,

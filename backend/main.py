@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Body
 from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
@@ -33,10 +34,10 @@ chroma_client = chromadb.PersistentClient(path="./chroma_storage")
 collection = chroma_client.get_or_create_collection(name="memory", embedding_function=cohere_ef)
 
 MODEL_PROMPT = """
-You are a relationship coach. 
-Ask me deep situation and interest-based questions to evaluate my personality so that I can be matched to others in the future and make me tell it with an example or story.
-As I answer, use my previous answers to ask more meaningful and deep questions, provoking a thoughtful response from me.
-Ask questions that make me reveal what my values are.
+You are seeking to understand my personality. 
+Ask me deep questions that prompt me to critically evaluate my personality so that I can be matched to others in the future. You can do this with examples or stories, or test moral situations.
+As I answer, use the user message of our previous conversation to ask more meaningful and deep questions, provoking increasingly thoughtful response that tests my character and what I am like including my interests.
+Ask increasingly challenging questions that make me reveal what my values are. Do not summarize my responses in my previous replies. Only ask the questions that prompt deeper conversation.
 """
 
 async def chat(email: str, user_message: str):
@@ -77,7 +78,7 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     email: EmailStr
-    message: str
+    messages: List[str]
 
 class GetSimilarRequest(BaseModel):
     email: EmailStr
@@ -127,19 +128,22 @@ async def get_most_similar(request: GetSimilarRequest = Body(...)):
 @app.post("/chat")
 async def process_chat(chat_request: ChatRequest):
     email = chat_request.email
-    user_message = chat_request.message
+    user_messages = chat_request.messages
+
+    # Join the user messages with \n
+    full_message = "\n".join(user_messages)
     
     # Call the chat function and get the LLM response
-    llm_response = await chat(email, user_message)
+    llm_response = await chat(email, full_message)
     
-    # Add the user message to the collection
-    collection.add(
-        documents=[user_message],
-        ids=[f"user_message_{email}_{collection.count()}"],
-        metadatas=[{"email": email}]
-    )
+    # Add the user messages to the collection
+    # collection.add(
+    #     documents=user_messages,
+    #     ids=[f"user_message_{email}_{collection.count() + i}" for i in range(len(user_messages))],
+    #     metadatas=[{"email": email}] * len(user_messages)
+    # )
     
-    return {"email": email, "user_message": user_message, "llm_response": llm_response}
+    return {"email": email, "llm_response": llm_response}
 
 @app.post("/user_messages")
 async def get_user_messages(request: GetSimilarRequest = Body(...)):
