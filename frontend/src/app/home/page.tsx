@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { useUser } from '@auth0/nextjs-auth0/client'
 
 interface UserData {
+  name: string
   profileImage: string
   keywords: string[]
   description: string
@@ -43,6 +44,7 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
+    document.title = 'VoiceVenture | Home';
     if (user && user.email) {
       fetchUserData(user.email)
     }
@@ -108,6 +110,7 @@ export default function HomePage() {
           }
 
           setUserData({
+            name: data.user?.name,
             profileImage: data.user?.picture || '',
             keywords: ['Startup', 'Tech', data.user?.userType || ''],
             description: fullDescription,
@@ -163,6 +166,7 @@ export default function HomePage() {
         console.log('Profile submitted successfully:', data)
         setShowModal(false)
         setUserData({
+          name: user?.name || '',
           profileImage: user?.picture || '',
           keywords: ['Startup', 'Tech', userType],
           description: `I am a ${userType} looking to connect with ${matchType}s`,
@@ -186,6 +190,10 @@ export default function HomePage() {
     router.push('/chat')
   }
 
+  const redirectToMatches = () => {
+    router.push('/matches')
+  }
+
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
 
@@ -196,7 +204,14 @@ export default function HomePage() {
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         {userData ? (
-          <Card {...userData} />
+          <div className="space-y-8">
+            <Card {...userData} />
+            <div className="flex justify-center">
+              <Button onClick={redirectToMatches} size="lg" className="w-full max-w-md">
+                See my matches
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="flex justify-center items-center h-screen">
             <Mic className="w-8 h-8 animate-spin" />

@@ -31,8 +31,50 @@ class CohereEmbeddingFunction(EmbeddingFunction[Documents]):
         return [list(embedding) for embedding in embeddings]
 
 cohere_ef = CohereEmbeddingFunction(api_key=COHERE_API_KEY)
-chroma_client = chromadb.PersistentClient(path="./chroma_storage")
+# chroma_client = chromadb.PersistentClient(path="./chroma_storage")
+chroma_client = chromadb.Client()
 collection = chroma_client.get_or_create_collection(name="memory", embedding_function=cohere_ef)
+
+# List of sample responses
+messages = [
+    "My journey as a founder has been rooted in a deep commitment to creating technology that improves everyday lives. I’m driven by the challenge of identifying problems that people face daily and turning those challenges into innovative solutions. My focus is on building a culture that encourages curiosity, resilience, and collaboration. I believe that the true measure of a startup’s potential lies not just in its product but in the strength of its team and the diversity of its thought. I'm passionate about fostering a work environment where every voice is heard and valued, which I believe is key to sustainable success. My goal is to create a product that not only meets market needs but also makes a meaningful impact on the world.",
+    "As a VC, my primary focus is on identifying founders who are not just driven by profit but by a genuine passion to solve real-world problems. I’m drawn to individuals who demonstrate resilience and a unique perspective on their industry. I invest not just in ideas, but in the people behind them—those who have the tenacity to weather the inevitable challenges of building a startup. My approach to funding is deeply collaborative; I see myself as a partner to the founders I invest in, offering not just capital but also strategic guidance and mentorship. I’m particularly interested in sectors where technology intersects with social impact, believing that the most successful ventures are those that benefit society as a whole.",
+    "As a founder, my vision is centered on creating scalable technology solutions that address pressing global challenges. I’ve always been fascinated by how technology can bridge gaps and bring about societal change. My current project aims to disrupt the traditional education system by providing personalized learning experiences through AI-driven platforms. I’m a firm believer in the power of education to transform lives, and my goal is to make high-quality education accessible to everyone, regardless of their socioeconomic background. Collaboration and continuous learning are at the core of my leadership style. I encourage my team to constantly challenge the status quo and push the boundaries of what’s possible.",
+    "My investment philosophy is grounded in the belief that innovation is the lifeblood of progress. I’m constantly on the lookout for visionary founders who are not afraid to tackle big, complex problems. I have a particular interest in the fields of renewable energy and sustainability, as I believe that these areas will define the future of our planet. I’m drawn to founders who combine technical expertise with a strong sense of purpose and social responsibility. My role as a VC goes beyond providing funding—I aim to be a strategic partner, offering insights and support to help founders navigate the challenges of scaling their businesses. Ultimately, I’m looking to invest in companies that not only have the potential to be financially successful but also to make a positive impact on the world.",
+    "Being a founder has been the most challenging yet rewarding experience of my life. I’m passionate about creating products that empower individuals and communities. My current startup focuses on developing tools that help small businesses thrive in the digital economy. I’m driven by a deep belief in the potential of entrepreneurship to drive social change. My leadership style is inclusive and empathetic—I believe that the best ideas come from diverse perspectives, and I strive to create an environment where everyone feels empowered to contribute. My goal is to build a company that not only delivers value to its customers but also creates lasting, positive change in the communities it serves.",
+    "My approach to venture capital is shaped by my background in engineering and my passion for technology. I’m particularly interested in startups that are pushing the boundaries of what’s possible in fields like AI, robotics, and biotech. I look for founders who are deeply knowledgeable about their industry and have a clear vision of how their technology can change the world. I believe that the most successful startups are those that are able to combine cutting-edge technology with a deep understanding of the market and the needs of their customers. As an investor, I see myself as a partner to the founders I work with, providing not just capital but also the strategic guidance and industry connections they need to succeed.",
+    "My passion lies in using technology to solve some of the world’s most pressing problems. I’m particularly interested in the intersection of healthcare and technology, and my current startup is focused on developing AI-driven tools to improve patient outcomes in chronic disease management. I believe that the key to success as a founder is staying deeply connected to the needs of your users and constantly iterating on your product to meet those needs. I’m committed to building a company that not only delivers financial returns but also makes a meaningful difference in people’s lives. My leadership style is collaborative and mission-driven—I strive to inspire my team with a shared vision and a commitment to making a positive impact.",
+    "As a venture capitalist, I’m driven by a passion for discovering and nurturing the next generation of world-changing ideas. I focus on early-stage startups, particularly in the tech and healthcare sectors, where I believe the potential for innovation is greatest. My investment strategy is built on identifying founders who are not only technically proficient but also have a clear vision of how their product can create value in the market. I’m particularly interested in startups that are leveraging AI and machine learning to solve complex problems. Beyond providing capital, I see my role as a mentor and advisor, helping founders navigate the challenges of scaling their businesses and bringing their vision to life.",
+    "My journey as a founder has been fueled by a desire to create products that make a difference in people’s lives. I’m passionate about using technology to address social issues, and my current startup focuses on developing affordable housing solutions using sustainable materials. I believe that business can be a powerful force for good, and I’m committed to building a company that not only generates profit but also contributes to solving some of the world’s most pressing challenges. My leadership style is collaborative and inclusive—I believe that the best ideas come from diverse teams, and I strive to create an environment where everyone feels valued and empowered to contribute.",
+    "My approach to venture capital is rooted in a belief in the transformative power of technology. I’m particularly interested in startups that are developing innovative solutions in the fields of fintech, edtech, and healthcare. I look for founders who are not only passionate about their product but also have a deep understanding of the market and a clear strategy for scaling their business. I believe that the most successful startups are those that are able to combine technical expertise with a strong business model. As an investor, I see my role as a strategic partner, providing not just capital but also the guidance and support that founders need to turn their vision into reality.",
+    "My passion as a founder stems from a deep commitment to leveraging technology to create solutions that empower people. My current focus is on building a platform that democratizes access to mental health resources, making it easier for individuals to find the support they need. I believe that the key to building a successful startup is to stay laser-focused on the needs of your users and to continuously iterate on your product based on their feedback. I’m committed to creating a company culture that values transparency, empathy, and innovation. My goal is to build a company that not only delivers value to its users but also makes a positive impact on the world."
+]
+
+# List of corresponding emails
+emails = [
+    "cameron.bellewood@gmail.com",       # Corresponds to the first response
+    "cameron.beneteau@gmail.com",     # Corresponds to the second response
+    "emily.jones@gmail.com",    # Corresponds to the third response
+    "robert.brown@gmail.com",   # Corresponds to the fourth response
+    "susan.lee@gmail.com",      # Corresponds to the fifth response
+    "james.wilson@gmail.com",   # Corresponds to the sixth response
+    "olivia.martin@gmail.com",  # Corresponds to the seventh response
+    "david.moore@gmail.com",    # Corresponds to the eighth response
+    "linda.miller@gmail.com",   # Corresponds to the ninth response
+    "michael.clark@gmail.com",  # Corresponds to the tenth response
+    "sophia.taylor@gmail.com"   # Corresponds to the eleventh response
+]
+
+for message, email in zip(messages, emails):
+    # Save the chat history to the database
+    collection.add(
+        documents=[message],
+        ids=[f"{collection.count()}"],
+        metadatas=[{
+            "email": email,
+            "user_messages": message
+        }],
+    )
 
 MODEL_PROMPT = """
 You are seeking to understand my personality as a Founder. 
@@ -136,6 +178,19 @@ class GetSimilarRequest(BaseModel):
 class GetCurrentUserExistsRequest(BaseModel):
     email: EmailStr
 
+class MatchRequest(BaseModel):
+    email: EmailStr
+
+class MatchCard(BaseModel):
+    name: str
+    score: int
+    profileImage: str
+    keywords: None
+    description: str
+    email: str
+    linkedin: str
+    website: str
+
 @app.get("/")
 async def read_root():
     return {"message": "Hello, FastAPI!!!!"}
@@ -160,7 +215,10 @@ async def summarize_text(request: SummarizeTextRequest):
 
 
 @app.get("/user_data/{email}")
-async def get_current_user_exists(email: str):
+async def get_user_data(email: str):
+    return get_current_user_exists(email)
+
+def get_current_user_exists(email: str):
     print('email is', email)
     current_user_email = email
     with open("users.json", "r") as file:
@@ -225,11 +283,12 @@ async def get_most_similar(request: GetSimilarRequest = Body(...)):
     # Query the collection for similar messages
     results = collection.query(
         query_texts=[combined_query],
-        n_results=50,
+        n_results=10,
         where={"email": {"$ne": email}},  # Exclude the current user
         include=['metadatas', 'distances']
     )
     
+
     # Process results to get the most similar user
     similar_users = {}
     for metadata, distance in zip(results['metadatas'][0], results['distances'][0]):
@@ -289,6 +348,7 @@ async def get_user_messages(request: GetSimilarRequest = Body(...)):
 
 @app.post("/save_chat_history")
 async def save_chat_history(chat_request: ChatRequest):
+    print("SAVE CHAT HISTORY")
     email = chat_request.email
     user_messages = chat_request.messages
     full_message = "\n".join(user_messages)
@@ -306,12 +366,7 @@ async def save_chat_history(chat_request: ChatRequest):
 
     return {"status": "success", "message": "Chat history saved successfully"}
 
-class GetAllChatsRequest(BaseModel):
-    email: EmailStr
-
-@app.get("/get_all_chats")
-async def get_all_chats(request: GetAllChatsRequest = Body(...)):
-    email = request.email
+def get_all_chats(email: EmailStr):
     results = collection.get(
         where={"email": email}
     )
@@ -340,6 +395,9 @@ async def check_user_in_chroma(email: str):
 
 @app.get("/get_full_user_conversation/{email}")
 async def get_full_user_conversation(email: str):
+    return get_user_conversation(email)
+
+def get_user_conversation(email: str):
     # Query the collection to get the user's conversation
     results = collection.get(
         where={"email": email}
@@ -359,6 +417,225 @@ async def get_full_user_conversation(email: str):
     else:
         return {"status": "error", "message": "User does not exist in ChromaDB"}
 
+@app.post("/matches")
+async def get_matches(request: MatchRequest = Body(...)):
+    print('GET MATCHES')
+
+    matches = []
+    top_users = get_similar_emails(request.email)
+    top_data = get_similar_data(request.email)
+
+    # Get all messages for the given user
+    user_messages = collection.get(
+        where={"email": request.email}
+    )
+    
+    # Combine all user messages into a single query
+    combined_query = " ".join(user_messages['documents'])
+    
+    # Query the collection for similar messages, including distances
+    results = collection.query(
+        query_texts=[combined_query],
+        n_results=10,
+        where={"email": {"$ne": request.email}},  # Exclude the current user
+        include=['metadatas', 'distances']
+    )
+
+    # Filter results based on matchType
+    filtered_results = []
+    for metadata, distance in zip(results['metadatas'][0], results['distances'][0]):
+        similar_user_email = metadata['email']
+        query_user = get_current_user_exists(request.email)['user']
+        result_user = get_current_user_exists(similar_user_email)['user']
+
+        if query_user['matchType'] == result_user['userType']:
+            filtered_results.append((metadata, distance))
+
+    # If no results remain after filtering, return an empty list
+    if not filtered_results:
+        return {"matches": []}
+
+    # Extract filtered distances
+    filtered_distances = [distance for _, distance in filtered_results]
+    min_distance = min(filtered_distances)
+    max_distance = max(filtered_distances)
+
+    # Define the desired score range
+    min_score = 13
+    max_score = 93
+
+    # Calculate scores and build the matches list
+    for metadata, distance in filtered_results:
+        similar_user_email = metadata['email']
+        result_string = get_user_conversation(similar_user_email)['user_conversations'][0]
+        result_user = get_current_user_exists(similar_user_email)['user']
+
+        # Normalize the distance and calculate the score
+        normalized_distance = (distance - min_distance) / (max_distance - min_distance)
+        score = round(min_score + (1 - normalized_distance) * (max_score - min_score))
+
+        match_summary = await get_match_summary(combined_query, result_string, query_user['name'], result_user['name'], score)
+
+
+        match = dict()
+        match['name'] = result_user['name']
+        match['score'] = score
+        match['profileImage'] = result_user['picture']
+        match['keywords'] = await get_keywords_from_string(result_string)
+        match['description'] = match_summary
+        match['email'] = result_user['user_email']
+        match['linkedin'] = result_user['linkedin']
+        match['website'] = result_user['website']
+        match['webSummitProfile'] = result_user['webSummitProfile']
+        matches.append(match)
+
+    print(f"MATCHES: {matches}")
+
+    return {"matches": matches}
+
+async def get_match_summary(query_string, result_string, query_user, result_user, score):
+    print("GET MATCH SUMMARY")
+
+    client = AsyncGroq(api_key=GROQ_API_KEY)
+
+    SUMMARY_PROMT=f'''
+        I have a matching service that connects users based on the similarities of their answers to previous prompts.
+        I would like you to give me a short description of the similarities between the two following contents:
+        Query string: {query_string}
+        Result string: {result_string}
+        Please use the tone of a matchmaker and make connections between the two but remember this is not dating app, it for more professional relationships.
+        This will be shown on a matchmaking page so that users can see a short description of why one person may be a good connection.
+        Please do not mention anything about 'query string' or 'result string'.
+        Please keep the description short and sweet without too much detail.
+        When referring to the matched user, please use their first name and address the current user in first person.
+        Speak to the reader of the webpage but do not address them, keep the focus on the match found.
+        Result string user: {result_user}
+        I am also giving you a match score between 0 and 100 for these two people.
+        If there score is high please be very positive about the match.
+        if the score is low please do not be as energetic about the match.
+        We want the summary description of the match (or lack there of) to match the score rating.
+        You cannot mention the score in your rating (not always) and do not say anything about how it affects the description.
+        Score: {score}
+        '''
+    
+    # SUMMARY_PROMT = f'''
+    #     I have a matching service that connects users based on the similarities of their answers to previous prompts.
+    #     You will be proving the description on a users homepage describing the similarities between them.
+    #     Please only use the query string and result string I will give you and no other information.
+    #     I would like you to find and summarize the main similarities between the two users prompts.
+    #     This could be interests, work ethic, or anything else that shows in both prompts.
+    #     Query string: {query_string}
+    #     Result string: {result_string}
+    #     Please keep the summary short and remember you are speaking to the user about their match.
+    #     Do not address the user and only speak about the matched person in third person.
+    #     The name of the person this user has matched with is: {result_user}
+    # '''
+
+    # Construct the messages list
+    messages = [{'role': 'system', 'content': SUMMARY_PROMT}]
+    
+    # Get the LLM response
+    chat_completion = await client.chat.completions.create(
+        messages=messages,
+        model="llama3-8b-8192"
+    )
+
+    return chat_completion.choices[0].message.content
+
+def get_similar_emails(email: EmailStr):
+    print("GET SIMILAR EMAILS")
+    print(email)
+
+    # Get all messages for the given user
+    user_messages = collection.get(
+        where={"email": email}
+    )
+
+    print(f"USER MESSAGES: {user_messages}")
+    
+    if not user_messages['documents']:
+        return []
+    
+    # Combine all user messages into a single query
+    combined_query = " ".join(user_messages['documents'])
+    
+    # Query the collection for similar messages
+    results = collection.query(
+        query_texts=[combined_query],
+        n_results=50,
+        where={"email": {"$ne": email}},  # Exclude the current user
+        include=['metadatas', 'distances']
+    )
+
+    print(f"RESULTS: {results}")
+
+    emails = []
+    # distances = []
+
+    for metadata in results['metadatas'][0]:
+        emails.append(metadata['email'])
+
+    # for distances in results['distances'][0]:
+        # distances.append(distances)
+
+    print(f"EMAILS: {emails}")
+
+    # return {"emails": emails, "distances": distances}
+
+    return emails
+
+def get_similar_data(email: EmailStr):
+    print("GET SIMILAR DATA")
+    print(email)
+
+    # Get all messages for the given user
+    user_messages = collection.get(
+        where={"email": email}
+    )
+
+    print(f"USER MESSAGES: {user_messages}")
+    
+    if not user_messages['documents']:
+        return []
+    
+    # Combine all user messages into a single query
+    combined_query = " ".join(user_messages['documents'])
+    
+    # Query the collection for similar messages
+    results = collection.query(
+        query_texts=[combined_query],
+        n_results=2,
+        where={"email": {"$ne": email}},  # Exclude the current user
+        include=['metadatas', 'distances']
+    )
+
+    print(f"RESULTS: {results}")
+
+async def get_keywords_from_string(query_string):
+    client = AsyncGroq(api_key=GROQ_API_KEY)
+
+    KEYWORD_PROMT = f'''
+        A user has just taken a test so we can learn a little more about them.
+        The only response I need from you is three indidivual descritive words to summarize their test.
+        Seperate them by one space each and title case each word.
+        There test result is as follows: {query_string}.
+        Do not add anything else to the response.
+    '''
+
+    # Construct the messages list
+    messages = [{'role': 'system', 'content': KEYWORD_PROMT}]
+    
+    # Get the LLM response
+    chat_completion = await client.chat.completions.create(
+        messages=messages,
+        model="llama3-8b-8192"
+    )
+
+    response = chat_completion.choices[0].message.content
+    words = response.split(' ')
+    words = [word for word in words if word]
+
+    return words
 
 if __name__ == "__main__":
     import uvicorn

@@ -24,3 +24,5 @@ __pycache__/
 chroma_storage/
 
 ENV_DIR
+
+backend/user_storage/users.json

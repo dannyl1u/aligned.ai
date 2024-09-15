@@ -51,6 +51,10 @@ function ChatPageContent() {
   }, [user]) // Dependency on user to ensure the check is enforced
 
   useEffect(() => {
+    document.title = 'VoiceVenture | Chat';
+  })
+
+  useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
     }
