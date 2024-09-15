@@ -196,7 +196,7 @@ function ChatPageContent() {
       ])
 
       // Uncomment the line below if you want to enable speech synthesis
-      // speak(botResponse)
+      speak(botResponse)
     } catch (error) {
       console.error('Error transcribing audio:', error)
       setMessages((prev) => [
