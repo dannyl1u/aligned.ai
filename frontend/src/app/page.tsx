@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import backgroundImage from './pictures/Background.png';
 
 export default function LandingPage() {
   const { user, error, isLoading } = useUser()
@@ -24,48 +25,69 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+      <header className="px-4 lg:px-6 h-14 flex items-center relative z-20 bg-black">
         <Link className="flex items-center justify-center" href="#">
-          <Mic className="h-6 w-6 text-primary" />
-          <span className="ml-2 text-2xl font-bold text-primary">
+          <Mic className="h-8 w-8 text-primary text-white" />
+          <span className="ml-2 text-3xl font-bold text-primary text-white">
             VoiceVenture
           </span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center py-2">
           <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4"
             href="#"
           >
-            Features
+            HOME
           </Link>
           <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4"
             href="#"
           >
-            Pricing
+            ABOUT US
           </Link>
           <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
+            className="text-lg font-medium hover:underline underline-offset-4"
             href="#"
           >
-            About
+            GET MATCHED
+          </Link>
+          <Link
+            className="text-lg font-medium hover:underline underline-offset-4"
+            href="#"
+          >
+            STARTUPS
+          </Link>
+          <Link
+            className="text-lg font-medium hover:underline underline-offset-4"
+            href="#"
+          >
+            VC FUNDS
           </Link>
           <Link href="/api/auth/login">
-            <Button variant="outline">Login / Sign Up</Button>
+            <Button variant="outline" className="text-lg px-6 py-3">Login / Sign Up</Button>
           </Link>
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary mx-auto">
+        <video
+    autoPlay
+    loop
+    muted
+    className="absolute inset-0 w-full h-full object-cover md:h-96 lg:h-[40rem]"
+  >
+    <source src="/waterFull.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+          <div className="container px-4 md:px-6 mx-auto relative z-10">
+            <div className="flex flex-col mx-auto items-center space-y-4 text-center ">
+                <div className="space-y-2 mx-auto ">
+                <h1 className="text-3xl font-bold flex justify-center h-full items-center tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
                   Find Founders and VCs with Your Voice
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-200 md:text-xl">
                   Use the power of AI to connect with the right people in the
-                  startup ecosystem. Just speak, and we ll find the perfect
+                  startup ecosystem. Just speak, and we'll find the perfect
                   match.
                 </p>
               </div>
@@ -88,28 +110,27 @@ export default function LandingPage() {
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
-          <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
-              How It Works
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="container px-4 md:px-6 mx-auto">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8 text-black">
+  How It Works
+</h2>            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center">
                 <Mic className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Speak Your Needs</h3>
+                <h3 className="text-xl font-bold mb-2 text-black">Speak Your Needs</h3>
                 <p className="text-gray-600">
-                  Simply tell us what you re looking for in a founder or VC.
+                  Simply tell us what you're looking for in a founder or VC.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <Zap className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">AI-Powered Matching</h3>
+                <h3 className="text-xl font-bold mb-2 text-black">AI-Powered Matching</h3>
                 <p className="text-gray-600">
                   Our LLM analyzes your request and finds the best matches.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center">
                 <Users className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-bold mb-2">Connect</h3>
+                <h3 className="text-xl font-bold mb-2 text-black">Connect</h3>
                 <p className="text-gray-600">
                   Get introduced to relevant founders and VCs in no time.
                 </p>
@@ -117,10 +138,10 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
+        <section className="w-full py-12 md:py-24 lg:py-32 mx-auto">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mx-auto">
+              <div className="space-y-2 mx-auto">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                   Ready to Revolutionize Your Networking?
                 </h2>
@@ -151,7 +172,7 @@ export default function LandingPage() {
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-gray-500">
-          © 2023 VoiceVenture. All rights reserved.
+          © 2024 VoiceVenture. All rights reserved.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" href="#">
