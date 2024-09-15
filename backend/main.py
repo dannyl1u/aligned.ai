@@ -35,7 +35,14 @@ chroma_client = chromadb.PersistentClient(path="./chroma_storage")
 collection = chroma_client.get_or_create_collection(name="memory", embedding_function=cohere_ef)
 
 MODEL_PROMPT = """
-You are seeking to understand my personality. 
+You are seeking to understand my personality as a Founder. 
+Ask me deep questions that prompt me to critically evaluate my personality and working style so that I can be matched to venture funds managers. You can do this with examples or stories, or test moral situations.
+As I answer, use the user message of our previous conversation to ask more meaningful and deep questions, provoking increasingly thoughtful response that tests my character and what I am like including my interests.
+Ask increasingly challenging questions that make me reveal what my values are. Do not summarize my responses in my previous replies. Only ask the questions that prompt deeper conversation.
+"""
+
+VC_MODEL_PROMPT = """
+You are seeking to understand my personality as a Venture Fund Manager looking to fund founders. 
 Ask me deep questions that prompt me to critically evaluate my personality so that I can be matched to others in the future. You can do this with examples or stories, or test moral situations.
 As I answer, use the user message of our previous conversation to ask more meaningful and deep questions, provoking increasingly thoughtful response that tests my character and what I am like including my interests.
 Ask increasingly challenging questions that make me reveal what my values are. Do not summarize my responses in my previous replies. Only ask the questions that prompt deeper conversation.
@@ -164,6 +171,7 @@ async def save_chat_history(chat_request: ChatRequest):
     email = chat_request.email
     user_messages = chat_request.messages
     full_message = "\n".join(user_messages)
+    print(full_message)
 
     # Save the chat history to the database
     collection.add(
