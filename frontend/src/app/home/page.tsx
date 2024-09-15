@@ -44,7 +44,7 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-    document.title = 'VoiceVenture | Home';
+    document.title = 'aligned.ai | Home';
     if (user && user.email) {
       fetchUserData(user.email)
     }
@@ -221,7 +221,7 @@ export default function HomePage() {
         )}
       </main>
       <footer className="border-t py-4 text-center text-sm text-gray-500">
-        © 2023 VoiceVenture. All rights reserved.
+        © 2023 aligned.ai. All rights reserved.
       </footer>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>

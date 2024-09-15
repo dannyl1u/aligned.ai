@@ -51,7 +51,7 @@ function ChatPageContent() {
   }, [user]) // Dependency on user to ensure the check is enforced
 
   useEffect(() => {
-    document.title = 'VoiceVenture | Chat';
+    document.title = 'aligned.ai | Chat';
   })
 
   useEffect(() => {

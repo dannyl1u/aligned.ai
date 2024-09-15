@@ -18,7 +18,7 @@ const MatchesPageContent: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null)
 
   useEffect(() => {
-    document.title = 'VoiceVenture | Matches'
+    document.title = 'aligned.ai | Matches'
   }, [])
 
   useEffect(() => {

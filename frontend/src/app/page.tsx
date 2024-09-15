@@ -18,7 +18,7 @@ export default function LandingPage() {
   const vcsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    document.title = 'VoiceVenture';
+    document.title = 'aligned.ai';
   })
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function LandingPage() {
           <Link className="flex items-center justify-center" href="#">
             <Mic className="h-8 w-8 text-white" />
             <span className="ml-2 text-2xl font-bold text-white tracking-tight bg-clip-text ">
-              VoiceVenture
+              aligned.ai
             </span>
           </Link>
           <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
@@ -209,7 +209,7 @@ export default function LandingPage() {
                     Ready to Revolutionize Your Networking?
                   </h2>
                   <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    Join VoiceVenture today and start connecting with the right
+                    Join aligned.ai today and start connecting with the right
                     people in the startup world.
                   </p>
                 </div>
@@ -235,7 +235,7 @@ export default function LandingPage() {
         </main>
         <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
           <p className="text-xs text-gray-500">
-            © 2024 VoiceVenture. All rights reserved.
+            © 2024 aligned.ai. All rights reserved.
           </p>
           <nav className="sm:ml-auto flex gap-4 sm:gap-6">
             <Link className="text-xs hover:underline underline-offset-4" href="#">

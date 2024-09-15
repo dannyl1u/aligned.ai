@@ -22,7 +22,7 @@ const Header: React.FC = () => {
             <Link href="/home" className="flex items-center space-x-2">
               <Mic className="h-6 w-6 text-primary" />
               <span className="text-2xl font-bold text-primary">
-                VoiceVenture
+                aligned.ai
               </span>
             </Link>
             <Tabs value={pathname} className="w-[400px]">
