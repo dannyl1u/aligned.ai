@@ -16,7 +16,7 @@ function ChatPageContent() {
 
   const [isRecording, setIsRecording] = useState(false)
   const [messages, setMessages] = useState<
-    { role: 'user' | 'assistant'; content: string }[]
+    { role: string; content: string }[]
   >([{ role: 'assistant', content: 'Hey! Tell me about yourself.' }])
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -24,6 +24,10 @@ function ChatPageContent() {
   const audioChunksRef = useRef<Blob[]>([])
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const utteranceRef = useRef<SpeechSynthesisUtterance[]>([])
+
+  useEffect(() => {
+    document.title = 'VoiceVenture | Chat';
+  })
 
   useEffect(() => {
     if (scrollAreaRef.current) {

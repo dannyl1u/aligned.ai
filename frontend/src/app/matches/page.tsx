@@ -15,44 +15,44 @@ const MatchesPageContent: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchMatches = async () => {
-      // try {
-      //   const response = await fetch('http://localhost:8000/matches');  // Fetch match data from the API
-      //   const data = await response.json();
-      //   setMatches(data.matches);  // Assume the matches are in the "matches" array in the response
-      //   setLoading(false);
-      // } catch (err) {
-      //   console.error('Failed to fetch matches:', err);
-      //   setLoading(false);
-      // }
+    document.title = 'VoiceVenture | Matches';
+  })
 
-      const matches = [
-        {
-          profileImage: '',
-          keywords: ['Happy', 'Sad', 'Excited'],
-          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-          email: 'cameron@gmail.com',
-          linkedin: 'cameron beneteau',
-          website: 'cameronbeneteau.com',
-        },
-        {
-          profileImage: '',
-          keywords: ['Happy', 'Sad', 'Excited'],
-          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-          email: 'cameron@gmail.com',
-          linkedin: 'cameron beneteau',
-          website: 'cameronbeneteau.com',
-        },
-      ]
+  useEffect(() => {
 
-      setMatches(matches)
-      setLoading(false)
+    if (user?.email){
+
+      // Define an async function inside useEffect
+      const fetchData = async () => {
+        
+        const matchesPayload = {
+          email: user?.email || '',
+        }
+        
+        try {
+          // Simulating an API call with a timeout
+          const response = await fetch('http://localhost:8000/matches', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(matchesPayload)
+          });
+          
+          const data = await response.json();
+          console.log(data.matches);
+          setMatches(data.matches);  // Set the result to the state
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setLoading(false);  // Set loading to false when the API call is done
+        }
+      };
+
+    // Call the async function
+    fetchData();
     }
-
-    fetchMatches()
-  }, [])
+  }, [user?.email]);  // Empty dependency array means this effect runs once after initial render
 
   if (isLoading || loading) {
     return (
@@ -78,6 +78,7 @@ const MatchesPageContent: React.FC = () => {
             matches.map((match, index) => (
               <Card
                 key={index}
+                name={match.name}
                 profileImage={match.profileImage} // Assuming the API returns this
                 keywords={match.keywords} // Assuming keywords is an array
                 description={match.description} // Assuming description of the match

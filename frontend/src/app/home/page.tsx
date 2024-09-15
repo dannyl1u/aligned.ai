@@ -14,6 +14,7 @@ export default function HomePage() {
   const { user, error, isLoading } = useUser()
 
   useEffect(() => {
+    document.title = 'VoiceVenture | Home';
     if (user) {
       console.log(user)
     }

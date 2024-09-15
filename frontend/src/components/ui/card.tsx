@@ -5,6 +5,7 @@ import Image from 'next/image'
 import React from 'react'
 
 type CardProps = {
+  name: string,
   profileImage: string
   keywords: string[]
   description: string
@@ -14,6 +15,7 @@ type CardProps = {
 }
 
 const Card: React.FC<CardProps> = ({
+  name,
   profileImage,
   keywords,
   description,
@@ -24,17 +26,10 @@ const Card: React.FC<CardProps> = ({
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-6 max-w-md mx-auto">
       {/* Profile Image */}
-      <Avatar className="w-24 h-24 mx-auto mb-4">
-        <AvatarImage src={profileImage} alt="Profile" />
-        <AvatarFallback>
-          {description
-            .split(' ')
-            .map((word) => word[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)}
-        </AvatarFallback>
-      </Avatar>
+      <img className="w-24 h-24 rounded-full mx-auto mb-4" src={profileImage} alt={`${name}'s profile`}/>
+
+      {/* Name */}
+      <h2 className="text-xl font-semibold text-center mb-2">{name}</h2>
 
       {/* Keywords/Interests */}
       <div className="flex flex-wrap justify-center gap-2 mb-4">
