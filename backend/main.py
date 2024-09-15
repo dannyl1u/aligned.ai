@@ -7,6 +7,7 @@ import chromadb
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 import cohere
 import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -65,6 +66,14 @@ async def chat(email: str, user_message: str):
     return assistant_message
 
 app = FastAPI()
+# Allow CORS for specific origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Replace with your React app's URL
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 class ChatRequest(BaseModel):
     email: EmailStr

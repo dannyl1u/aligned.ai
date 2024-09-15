@@ -74,8 +74,10 @@ export default function ChatPage() {
   }
 
   const speak = (text: string) => {
+    const rate = 1.4
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text)
+      utterance.rate = rate // Set the speaking rate
       window.speechSynthesis.speak(utterance)
     } else {
       console.warn('Speech Synthesis not supported in this browser.')
@@ -103,16 +105,32 @@ export default function ChatPage() {
       const transcription = transcriptionResponse.text || ''
       setMessages((prev) => [...prev, { role: 'user', content: transcription }])
 
-      // Process bot's response
-      setTimeout(() => {
-        const botResponse = `I heard you say: "${transcription}"`
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: botResponse },
-        ])
-        speak(botResponse) // Convert text to speech
-        setIsTranscribing(false)
-      }, 1000)
+      // Create the ChatRequest payload
+      const chatRequestPayload = {
+        user_id: user?.email || '', // Use user.email for user_id
+        message: transcription,
+      }
+
+      // Send the payload to the Flask backend and handle the response
+      const response = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(chatRequestPayload),
+      })
+
+      const data = await response.json()
+
+      // Process the response from the Flask backend
+      const botResponse = data.llm_response || 'Sorry, something went wrong.'
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: botResponse },
+      ])
+
+      speak(botResponse) // Convert text to speech
+      setIsTranscribing(false)
     } catch (error) {
       console.error('Error transcribing audio:', error)
       setMessages((prev) => [
