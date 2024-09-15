@@ -387,8 +387,8 @@ async def get_matches(request: MatchRequest = Body(...)):
     filtered_results = []
     for metadata, distance in zip(results['metadatas'][0], results['distances'][0]):
         similar_user_email = metadata['email']
-        result_user = get_current_user_exists(similar_user_email)['user']
         query_user = get_current_user_exists(request.email)['user']
+        result_user = get_current_user_exists(similar_user_email)['user']
 
         if query_user['matchType'] == result_user['userType']:
             filtered_results.append((metadata, distance))
@@ -456,7 +456,7 @@ async def get_match_summary(query_string, result_string, query_user, result_user
         If there score is high please be very positive about the match.
         if the score is low please do not be as energetic about the match.
         We want the summary description of the match (or lack there of) to match the score rating.
-        You can mention the score in your rating (not always) but do not say anything about how it affects the description.
+        You cannot mention the score in your rating (not always) and do not say anything about how it affects the description.
         Score: {score}
         '''
     
