@@ -49,10 +49,25 @@ export default function HomePage() {
   const fetchUserData = async (email: string) => {
     try {
       const response = await fetch(`http://localhost:8000/user_data/${email}`)
+      console.log('response:', response)
       if (response.ok) {
-        console.log('have data')
         const data = await response.json()
-        setUserData(data)
+
+        if (data.status === 'success') {
+          setUserData(data.user)
+          setUserData({
+            profileImage: data.user?.picture || '',
+            keywords: ['Startup', 'Tech', userType],
+            description: `I am a ${userType} looking to connect with ${matchType}s`,
+            email: email || data.user?.email || '',
+            linkedin: data.user?.linkedin,
+            website: data.user?.website,
+            webSummitProfile: data.user?.webSummitProfile,
+          })
+        } else {
+          console.log('User does not exist, showing modal')
+          setShowModal(true)
+        }
       } else {
         console.log('showing modal')
         setShowModal(true)
@@ -75,6 +90,8 @@ export default function HomePage() {
       linkedin,
       website,
       webSummitProfile,
+      userType: userType,
+      matchType: matchType,
     }
 
     try {
@@ -114,6 +131,8 @@ export default function HomePage() {
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>{error.message}</div>
+
+  console.log('userdata is', userData)
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-100 to-blue-100">

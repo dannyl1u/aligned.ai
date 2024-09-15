@@ -79,8 +79,15 @@ class ChatRequest(BaseModel):
     messages: List[str]
 
 class SetNewUserRequest(BaseModel):
-    email: EmailStr
-    role: str 
+    user_email: EmailStr
+    given_name: str
+    family_name: str
+    name: str
+    picture: str
+    linkedin: str
+    website: str
+    webSummitProfile: str
+    
 
 class GetSimilarRequest(BaseModel):
     email: EmailStr
@@ -92,28 +99,52 @@ class GetCurrentUserExistsRequest(BaseModel):
 async def read_root():
     return {"message": "Hello, FastAPI!!!!"}
 
-@app.post("/get_current_user_exists")
-async def get_current_user_exists(request: GetCurrentUserExistsRequest = Body(...)):
-    current_user_email = request.email
-    with open("backend/users.json", "r") as file:
+@app.get("/user_data/{email}")
+async def get_current_user_exists(email: str):
+    print('email is', email)
+    current_user_email = email
+    with open("users.json", "r") as file:
         data = json.load(file)
         users = data["users"]
         for user in users:
-            if user["email"] == current_user_email:
-                return {"current_user_exists": "true", "current_user_role": user["role"]}
-            
-    return {"current_user_exists": "false"}
+            if user["user_email"] == current_user_email:
+                return {"status": "success", "user": user}
+    
+    print('didnt find email')
+    return {"status": "error", "message": "User does not exist"}
 
-@app.post("/set_new_user")
+
+@app.post("/submit_profile")
 async def set_new_user(request: SetNewUserRequest):
-    with open("backend/users.json", "r") as file:
-        printf("appending new uesr")
-        data = json.load(file)
-        printf("email uesr" + request.email + "role" + request.role)
-        new_user = {"email": request.email, "role": request.role}
+    try:
+        # Read the existing data from the JSON file
+        with open("users.json", "r") as file:
+            data = json.load(file)
+        
+        # Ensure "users" key exists in the JSON structure
+        if "users" not in data:
+            data["users"] = []
+
+        # Convert Pydantic model to dictionary
+        new_user = request.dict()
+
+        # Check if the user already exists based on email
+        if any(user["user_email"] == new_user["user_email"] for user in data["users"]):
+            return {"status": "error", "message": "User already exists"}
+
+        # Add the new user to the list
         data["users"].append(new_user)
-        with open('data.json', 'w') as f:
+
+        # Write the updated data back to the JSON file
+        with open("users.json", 'w') as f:
             json.dump(data, f, indent=4)
+
+        return {"status": "success", "message": "User profile saved successfully"}
+    
+    except Exception as e:
+        logger.error(f"Error saving user profile: {str(e)}")
+        return {"status": "error", "message": "Failed to save user profile"}
+
 
 @app.get("/getMostSimilar")
 async def get_most_similar(request: GetSimilarRequest = Body(...)):
