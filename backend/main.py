@@ -78,12 +78,42 @@ class ChatRequest(BaseModel):
     email: EmailStr
     messages: List[str]
 
+class SetNewUserRequest(BaseModel):
+    email: EmailStr
+    role: str 
+
 class GetSimilarRequest(BaseModel):
+    email: EmailStr
+
+class GetCurrentUserExistsRequest(BaseModel):
     email: EmailStr
 
 @app.get("/")
 async def read_root():
     return {"message": "Hello, FastAPI!!!!"}
+
+@app.post("/get_current_user_exists")
+async def get_current_user_exists(request: GetCurrentUserExistsRequest = Body(...)):
+    current_user_email = request.email
+    with open("backend/users.json", "r") as file:
+        data = json.load(file)
+        users = data["users"]
+        for user in users:
+            if user["email"] == current_user_email:
+                return {"current_user_exists": "true", "current_user_role": user["role"]}
+            
+    return {"current_user_exists": "false"}
+
+@app.post("/set_new_user")
+async def set_new_user(request: SetNewUserRequest):
+    with open("backend/users.json", "r") as file:
+        printf("appending new uesr")
+        data = json.load(file)
+        printf("email uesr" + request.email + "role" + request.role)
+        new_user = {"email": request.email, "role": request.role}
+        data["users"].append(new_user)
+        with open('data.json', 'w') as f:
+            json.dump(data, f, indent=4)
 
 @app.get("/getMostSimilar")
 async def get_most_similar(request: GetSimilarRequest = Body(...)):

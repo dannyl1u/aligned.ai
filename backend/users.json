@@ -1,0 +1,12 @@
+{
+    "users": [
+        {
+            "email": "sophia@gmail.com", 
+            "role": "founder"
+        },
+        {
+            "email": "cameron@gmail.com", 
+            "role": "investor"
+        }
+    ]
+}
