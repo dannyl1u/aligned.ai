@@ -29,8 +29,8 @@ class CohereEmbeddingFunction(EmbeddingFunction[Documents]):
         return [list(embedding) for embedding in embeddings]
 
 cohere_ef = CohereEmbeddingFunction(api_key=COHERE_API_KEY)
-chroma_client = chromadb.Client()
-collection = chroma_client.create_collection(name="memory", embedding_function=cohere_ef)
+chroma_client = chromadb.PersistentClient(path="./chroma_storage")
+collection = chroma_client.get_or_create_collection(name="memory", embedding_function=cohere_ef)
 
 MODEL_PROMPT = """
 You are a relationship coach. 
@@ -48,7 +48,7 @@ async def chat(email: str, user_message: str):
         n_results=10,
         where={"email": email}
     )
-    previous_messages = results['documents'][0]
+    previous_messages = results['documents'][0] if results['documents'] else []
     
     # Construct the messages list
     messages = [{'role': 'system', 'content': MODEL_PROMPT}]
